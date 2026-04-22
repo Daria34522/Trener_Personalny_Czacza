@@ -19,6 +19,7 @@ class MainMenu(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Menu główne")
+
         # Łączenie przycisków z metodami
         self.ui.Start_training.clicked.connect(self.startTraining)
         self.ui.Settings.clicked.connect(self.settings)
@@ -28,6 +29,8 @@ class MainMenu(QMainWindow):
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
 
     # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcjie w mainie
+    pass
+
     # obsługa przycisków oraz funkcji okienka
     def startTraining(self):
         pass

@@ -19,12 +19,13 @@ class ProfileWindow(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Wybór profilu")
+
         # Łączenie przycisków z metodami
         self.ui.Create_profile_button.clicked.connect(self.createProfile)
         self.ui.Select_profile_button.clicked.connect(self.loadProfile)
 
-        #TODO Ładowanie profili do wyboru przez użytkownika
-
+        # TODO Ładowanie profili do wyboru przez użytkownika
+        pass
 
     # obsługa przycisków oraz funkcji okienka
     def createProfile(self):
@@ -37,8 +38,9 @@ class ProfileWindow(QMainWindow):
         if (age == "" or user_name == ""):
             self.ui.Message_from_database.setText("Błędne dane") # Wyświetlenie błędu w gui
             return
-        #TODO Komunikacja z bazą danych oraz stworzenie profilu
 
+        # TODO Komunikacja z bazą danych oraz stworzenie profilu
+        pass
 
     def loadProfile(self):
         self.ui.Message_from_database_2.setText("")
@@ -48,7 +50,9 @@ class ProfileWindow(QMainWindow):
         if(data == ""):
             self.ui.Message_from_database_2.setText("Proszę wybrać profil do załadowania") # Wyświetlenie błędu w gui
             return
-        #TODO Komunikacja z bazą danych oraz załadowanie profilu
+
+        # TODO Komunikacja z bazą danych oraz załadowanie profilu
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
