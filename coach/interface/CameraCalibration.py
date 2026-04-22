@@ -35,7 +35,7 @@ class CameraCalibration(QMainWindow):
         self.ui.Camera_front.setFixedSize(640, 480)
         self.ui.Camera_side.setFixedSize(640, 480)
 
-        # TODO Sprawdzene czy mamy podłączone dwie kamerki oraz 'pobranie' obrazu pozwalającego na wyświetlenie w ui
+        # TODO Sprawdzene czy mamy podłączone dwie kamerki oraz 'pobranie' obrazu pozwalającego na wyświetlenie w ui LUB przekazanie 'kamer' w konstruktorze do klasy i sprawdzenie czy działają w mainie
         pass
 
         # TODO Konfiguracja obrazu z kamery przedniej
