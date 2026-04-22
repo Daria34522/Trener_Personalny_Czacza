@@ -27,9 +27,7 @@ class MainMenu(QMainWindow):
         self.ui.Recommendations.clicked.connect(self.recommendations)
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
 
-        #TODO Ładowanie profili do wyboru przez użytkownika
-
-
+    # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcjie w mainie
     # obsługa przycisków oraz funkcji okienka
     def startTraining(self):
         pass
@@ -45,7 +43,7 @@ class MainMenu(QMainWindow):
 
     def recommendations(self):
         pass
-    
+
     def profileSelection(self):
         pass
 
