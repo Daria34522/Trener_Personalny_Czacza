@@ -36,7 +36,7 @@ class Stats(QMainWindow):
         pass
 
     def displayDayStats(self):
-        date = self.ui.Selected_date.selectedDate().toString("dd-MM-yyyy").split("-");
+        date = self.ui.Selected_date.selectedDate().toString("dd-MM-yyyy").split("-")
         # TODO pobranie danych z bazy danych oraz wyświetlenie danych
         pass
 

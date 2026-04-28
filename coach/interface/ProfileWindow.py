@@ -1,7 +1,8 @@
 import sys
 from sys import path
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PIL import Image
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
@@ -22,7 +23,10 @@ class ProfileWindow(QMainWindow):
 
         # Łączenie przycisków z metodami
         self.ui.Create_profile_button.clicked.connect(self.createProfile)
-        self.ui.Select_profile_button.clicked.connect(self.loadProfile)
+        self.ui.Browse.clicked.connect(self.choosePhoto)
+        for i in range(1, 7):
+            widget = self.findChild(QWidget, f"ProfileImage_{i}")
+            widget.mousePressEvent = lambda event, w=widget: self.loadProfile(w)
 
         # TODO Ładowanie profili do wyboru przez użytkownika
         pass
@@ -33,26 +37,44 @@ class ProfileWindow(QMainWindow):
 
         # Pobranie z menu danych użytkownika i sprawdzenie ich poprawności
         user_name = self.ui.User_name.text().strip()
-        age = self.ui.Age.text().strip()
+        image_path = self.ui.Path.text()
+
         # obsługa błędnych danych
-        if (age == "" or user_name == ""):
-            self.ui.Message_from_database.setText("Błędne dane") # Wyświetlenie błędu w gui
+        if (user_name == ""):
+            self.ui.Message_from_database.setText("Proszę podać nazwe użytkownika") # Wyświetlenie błędu w gui
+            return
+        try:
+            img = Image.open(image_path)
+            img.verify()  # sprawdza integralność pliku
+        except Exception:
+            self.ui.Message_from_database.setText("Błędny adres lub plik nie jest obsługiwanym typem obrazu") # Wyświetlenie błędu w gui
             return
 
         # TODO Komunikacja z bazą danych oraz stworzenie profilu
         pass
 
-    def loadProfile(self):
+    # TODO jednak inaczej będzie
+    def loadProfile(self, widget):
         self.ui.Message_from_database_2.setText("")
 
         # Pobranie z menu danych użytkownika i sprawdzenie ich poprawności
-        data = self.ui.Select_profile.currentText()
-        if(data == ""):
-            self.ui.Message_from_database_2.setText("Proszę wybrać profil do załadowania") # Wyświetlenie błędu w gui
-            return
+        number = widget.objectName().replace("ProfileImage_", "")
+        profile_name = self.findChild(QLabel, f"ProfileName_{number}")
+
+        # TODO obsługa pustego profilu
+        pass
 
         # TODO Komunikacja z bazą danych oraz załadowanie profilu
         pass
+
+    def choosePhoto(self):
+        file_name, _ = QFileDialog.getOpenFileName(
+            self,
+            "Wybierz zdjęcie",
+            "",
+            "Images (*.png *.jpg *.jpeg)"
+        )
+        self.ui.Path.setText(file_name)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
