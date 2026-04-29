@@ -92,9 +92,13 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="8,1">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="9,1">
            <item>
-            <widget class="QWidget" name="ProfileImage_1" native="true"/>
+            <widget class="QPushButton" name="ProfileImage_1">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="ProfileName_1">
@@ -117,9 +121,13 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="8,1">
+          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="9,1">
            <item>
-            <widget class="QWidget" name="ProfileImage_2" native="true"/>
+            <widget class="QPushButton" name="ProfileImage_2">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="ProfileName_2">
@@ -142,9 +150,13 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="8,1">
+          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="9,1">
            <item>
-            <widget class="QWidget" name="ProfileImage_3" native="true"/>
+            <widget class="QPushButton" name="ProfileImage_3">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="ProfileName_3">
@@ -171,9 +183,13 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="8,1">
+          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="9,1">
            <item>
-            <widget class="QWidget" name="ProfileImage_4" native="true"/>
+            <widget class="QPushButton" name="ProfileImage_4">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="ProfileName_4">
@@ -196,9 +212,13 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8" stretch="8,1">
+          <layout class="QVBoxLayout" name="verticalLayout_8" stretch="9,1">
            <item>
-            <widget class="QWidget" name="ProfileImage_5" native="true"/>
+            <widget class="QPushButton" name="ProfileImage_5">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="ProfileName_5">
@@ -221,9 +241,13 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_9" stretch="8,1">
+          <layout class="QVBoxLayout" name="verticalLayout_9" stretch="9,1">
            <item>
-            <widget class="QWidget" name="ProfileImage_6" native="true"/>
+            <widget class="QPushButton" name="ProfileImage_6">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="ProfileName_6">

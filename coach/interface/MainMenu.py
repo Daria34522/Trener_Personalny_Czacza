@@ -28,7 +28,7 @@ class MainMenu(QMainWindow):
         self.ui.Recommendations.clicked.connect(self.recommendations)
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
 
-    # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcjie w mainie
+    # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
     pass
 
     # obsługa przycisków oraz funkcji okienka
