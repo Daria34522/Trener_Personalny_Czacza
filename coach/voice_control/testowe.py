@@ -1,12 +1,14 @@
-from gtts import gTTS
-import pygame
+from voice_control import Speaker, Listener
 
-tts = gTTS("  Cześć, to test głosu będę twoim asystentem", lang="pl")
-tts.save("voice.mp3")
+if __name__ == '__main__':
+    speaker = Speaker(voice_filename="test")
+    text = "Jestem twoim asystentem"
+    speaker.gen_speak(text)
+    speaker.speak()
 
-pygame.mixer.init()
-pygame.mixer.music.load("voice.mp3")
-pygame.mixer.music.play()
+    # speaker.delete_file()
 
-while pygame.mixer.music.get_busy():
-    pass
+    # listener = Listener()
+    # print("Mów")
+    # text = listener.listen()
+    # print(text)
