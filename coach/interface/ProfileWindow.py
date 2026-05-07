@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from VoiceWorker import VoiceWorker
 
 
 def loadProfileImagesAndNames(Window):
@@ -63,6 +64,8 @@ class ProfileWindow(QMainWindow):
         ):  # Łączy każdy przycisk z metodą loadProfile a jako argument metody ustawia nazwe użytkownika
             widget = self.findChild(QPushButton, f"ProfileImage_{i}")
             widget.clicked.connect(lambda event, w=widget: self.loadProfile(w))
+        self.voice = VoiceWorker()
+        self.voice.say("Wybierz swój profil lub utwórz nowy")
 
     # obsługa przycisków oraz funkcji okienka
     def createProfile(self):

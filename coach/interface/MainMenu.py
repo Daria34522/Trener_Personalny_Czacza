@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
+from VoiceWorker import VoiceWorker
 
 class MainMenu(QMainWindow):
     def __init__(self):
@@ -27,6 +28,8 @@ class MainMenu(QMainWindow):
         self.ui.Calendar.clicked.connect(self.calendar)
         self.ui.Recommendations.clicked.connect(self.recommendations)
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
+        self.voice = VoiceWorker()
+        self.voice.say("Witaj w asystencie czaczy. Wybierz co chcesz zrobić")
 
 
     # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
