@@ -1,11 +1,20 @@
 import sys
 from sys import path
+import os
 
 from PySide6.QtMultimedia import QCamera, QMediaCaptureSession
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from PySide6.QtCore import QThread
+
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from voice_control.voice_control import Speaker, Listener
 
 
 def setup_camera_display(container, video_widget, session, camera): # 'Wrzucenie' obrazu z kamery do ui
@@ -14,6 +23,13 @@ def setup_camera_display(container, video_widget, session, camera): # 'Wrzucenie
     layout.addWidget(video_widget)
     session.setCamera(camera)
     session.setVideoOutput(video_widget)
+
+class VoiceWorker(QThread):
+    def run(self):
+        speaker = Speaker(voice_filename="ustawienie")
+        speaker.gen_speak("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
+        speaker.speak()
+        speaker.delete_file()
 
 
 class CameraCalibration(QMainWindow):
@@ -49,6 +65,8 @@ class CameraCalibration(QMainWindow):
         self.session2 = QMediaCaptureSession()
         self.view2 = QVideoWidget()
         setup_camera_display(self.ui.Camera_side, self.view2, self.session2, self.camera2)
+        self.voice = VoiceWorker()
+        self.voice.start()
 
     def messageToUser(self, message): # metoda pozwala wyświetlić komunikat dla użytkownika w polu 'Informacje' np. o niepoprawnym ustawieniu kamery
         self.ui.Message_from_app.setText(message)
@@ -58,5 +76,4 @@ if __name__ == "__main__":
 
     window = CameraCalibration()
     window.show()
-
     sys.exit(app.exec())
