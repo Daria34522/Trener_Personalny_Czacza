@@ -51,6 +51,7 @@ class MainMenu(QMainWindow):
     def profileSelection(self):
         pass
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
