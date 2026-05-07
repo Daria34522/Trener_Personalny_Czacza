@@ -47,14 +47,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="Settings">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
+          <widget class="QPushButton" name="Settings"/>
          </item>
         </layout>
        </widget>
@@ -76,14 +69,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="Stats">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
+          <widget class="QPushButton" name="Stats"/>
          </item>
         </layout>
        </widget>
@@ -105,14 +91,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="Start_training">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
+          <widget class="QPushButton" name="Start_training"/>
          </item>
         </layout>
        </widget>
@@ -134,14 +113,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="Calendar">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
+          <widget class="QPushButton" name="Calendar"/>
          </item>
         </layout>
        </widget>
@@ -163,14 +135,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="Recommendations">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
+          <widget class="QPushButton" name="Recommendations"/>
          </item>
         </layout>
        </widget>
@@ -192,14 +157,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QFrame" name="Profile_selection">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
+          <widget class="QPushButton" name="Profile_selection"/>
          </item>
         </layout>
        </widget>
