@@ -25,9 +25,19 @@ def setup_camera_display(container, video_widget, session, camera): # 'Wrzucenie
     session.setVideoOutput(video_widget)
 
 class VoiceWorker(QThread):
+    def __init__(self):
+        super().__init__()
+        self.text = ""
+        self.filename = ""
+
+    def say(self, text, filename="example"):
+        self.text = text
+        self.filename = filename
+        if not self.isRunning():
+            self.start()
     def run(self):
-        speaker = Speaker(voice_filename="ustawienie")
-        speaker.gen_speak("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
+        speaker = Speaker(voice_filename = self.filename)
+        speaker.gen_speak(self.text)
         speaker.speak()
         speaker.delete_file()
 
@@ -66,7 +76,8 @@ class CameraCalibration(QMainWindow):
         self.view2 = QVideoWidget()
         setup_camera_display(self.ui.Camera_side, self.view2, self.session2, self.camera2)
         self.voice = VoiceWorker()
-        self.voice.start()
+        self.voice.say("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
+
 
     def messageToUser(self, message): # metoda pozwala wyświetlić komunikat dla użytkownika w polu 'Informacje' np. o niepoprawnym ustawieniu kamery
         self.ui.Message_from_app.setText(message)
