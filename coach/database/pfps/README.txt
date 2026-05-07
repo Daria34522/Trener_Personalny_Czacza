@@ -1,0 +1,1 @@
+dodam tutaj obrazki przykładowe i/albo bedą storowane wybrane obrazki przez użytkownika
