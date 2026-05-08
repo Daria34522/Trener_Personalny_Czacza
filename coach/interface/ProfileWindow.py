@@ -27,7 +27,7 @@ def loadProfileImagesAndNames(Window):
 
         # Ustawianie obrazka oraz nazwy użytkownika dla jednego bloku
         Window.findChild(QLabel, f"ProfileName_{number}").setText(user_name)
-        Window.ui.Start_training.setStyleSheet(f"""
+        Window.findChild(QLabel, f"ProfileName_{i}").setStyleSheet(f"""
             QPushButton {{
                 border: none;
                 background-image: url('{img_path}');
