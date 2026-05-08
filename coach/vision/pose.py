@@ -1,32 +1,73 @@
-import os
 import cv2
 import mediapipe as mp
 from mediapipe.tasks.python import vision
 from mediapipe.tasks import python
-
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "pose_landmarker_heavy.task")
+from coach.vision.constants import MODEL_PATH
+from dataclasses import dataclass
 
 
 class PoseDetector:
-    def __init__(self):
+    def __init__(self, result_callback):
         self._base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
         self._options = vision.PoseLandmarkerOptions(
             base_options=self._base_options,
-            running_mode=vision.RunningMode.VIDEO,
-            output_segmentation_masks=True,
+            running_mode=vision.RunningMode.LIVE_STREAM,
+            result_callback=result_callback,
+            num_poses=1,
+            min_pose_detection_confidence=0.55,
+            min_pose_presence_confidence=0.55,
+            min_tracking_confidence=0.55,
         )
         self.detector = vision.PoseLandmarker.create_from_options(self._options)
 
     def detect(self, frame: cv2.typing.MatLike, timestamp: int):
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-        result = self.detector.detect_for_video(mp_image, timestamp)
+        try:
+            result = self.detector.detect_async(mp_image, timestamp)
+        except Exception:
+            result = None
         return result
 
 
-class PoseDrawer:
-    def __init__(self, draw_indices: bool = True):
-        self.draw_indices = draw_indices
+@dataclass
+class SmoothedPoseResult:
+    x: float
+    y: float
+    z: float
+    visibility: float
 
+
+class PoseLandmarkSmoother:
+    def __init__(self, alpha: float = 0.5):
+        self.alpha = alpha  # 0.1=bardzo gładko, 0.9=prawie surowo
+        self._prev = None
+
+    def smooth(self, landmarks) -> list[SmoothedPoseResult]:
+        if landmarks is None:
+            self._prev = None
+            return []
+
+        if self._prev is None:
+            self._prev = [(lm.x, lm.y, lm.z, lm.visibility) for lm in landmarks]
+            return [
+                SmoothedPoseResult(x, y, z, visibility)
+                for x, y, z, visibility in self._prev
+            ]
+
+        smoothed = []
+        for i, lm in enumerate(landmarks):
+            px, py, pz, p_visibility = self._prev[i]
+            sx = self.alpha * lm.x + (1 - self.alpha) * px
+            sy = self.alpha * lm.y + (1 - self.alpha) * py
+            sz = self.alpha * lm.z + (1 - self.alpha) * pz
+            self._prev[i] = (sx, sy, sz, p_visibility)
+            smoothed.append(SmoothedPoseResult(sx, sy, sz, p_visibility))
+
+        return smoothed
+
+
+class PoseDrawer:
+    def __init__(self):
         self.connections = [
             (0, 1),
             (1, 2),
@@ -54,39 +95,24 @@ class PoseDrawer:
             (28, 30),
             (30, 32),
         ]
+        self.important_points = frozenset({23, 24, 25, 26, 27, 28, 31, 32})
 
-        self.important_points = {
-            # fmt: off
-            23, 24,  # biodra
-            25, 26,  # kolana
-            27, 28,  # kostki
-            31, 32,  # stopy
-        }  # fmt: on
-
-    def draw(self, frame: cv2.typing.MatLike, result):
-        if not result.pose_landmarks:
+    def draw(self, frame, landmarks):
+        if landmarks is None:
             return frame
 
         h, w, _ = frame.shape
-        landmarks = result.pose_landmarks[0]
 
-        for idx, lm in enumerate(landmarks):
-            x, y = int(lm.x * w), int(lm.y * h)
+        # Liczenie współrzędnych.
+        pts = [(int(lm.x * w), int(lm.y * h)) for lm in landmarks]
 
-            if idx in self.important_points:
-                color = (0, 0, 255)
-            else:
-                color = (0, 255, 0)
+        # Rysowanie połączeń
+        for s, e in self.connections:
+            cv2.line(frame, pts[s], pts[e], (255, 0, 0), 2)
 
-            cv2.circle(frame, (x, y), 4, color, -1)
-
-        for start_idx, end_idx in self.connections:
-            s = landmarks[start_idx]
-            e = landmarks[end_idx]
-
-            x1, y1 = int(s.x * w), int(s.y * h)
-            x2, y2 = int(e.x * w), int(e.y * h)
-
-            cv2.line(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        # Rysowanie punktów.
+        for idx, pt in enumerate(pts):
+            color = (0, 0, 255) if idx in self.important_points else (0, 255, 0)
+            cv2.circle(frame, pt, 4, color, -1)
 
         return frame
