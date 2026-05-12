@@ -21,6 +21,7 @@ from coach.vision.analysis.quality import QualityReport
 from coach.vision.analysis.quality import analyze_front, analyze_side
 
 from collections import Counter
+from VoiceWorker import VoiceWorker
 
 
 class PoseWorker(QObject):
@@ -74,6 +75,7 @@ class CameraCalibration(QMainWindow):
         ui_file.close()
         self.setCentralWidget(self.ui)
         self.setWindowTitle("Menu kalibracji kamery")
+        self.voice = VoiceWorker()
 
         # TODO Do przetestowania czy chcemy mieć kamerki 16:9 czy 4:3 oraz dopasowanie do tego interfejsu
         self.ui.Camera_front.setFixedSize(640, 360)
@@ -100,6 +102,7 @@ class CameraCalibration(QMainWindow):
             self.messageToUser(
                 "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
             )
+            self.voice.say("Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie.")
             return
 
         self.camera1 = QCamera(cameras[0])  # obraz z kamerki
@@ -154,14 +157,16 @@ class CameraCalibration(QMainWindow):
         show_issues = []
         for issue, count in combined_counter.most_common():
             if (
-                count > 14
+                count > 70
             ):  # jeśli dany problem pojawił się więcej niż 14 razy, wyświetl go użytkownikowi
                 show_issues.append(issue)
 
-        if len(self.issues_per_frame) > 30:
+        if len(self.issues_per_frame) > 150:
             self.issues_per_frame.pop(0)
 
         # TODO: komunikaty głosowe dla użytkownika o błędach
+        for issue in show_issues:
+            self.voice.say(issue)
         self.messageToUser("\n".join(show_issues))
 
     @Slot(QImage)
