@@ -1,0 +1,11 @@
+INSERT INTO music VALUES
+(1,"Havana","Camilo Cabello",,)
+(2,"September","Earth, Wind & Fire",,)
+(3,"Conga","Gloria Estegan & Miami Sound Machine",,)
+(4,"Let's Get Loud","Jeniffer Lopez",,)
+(5,"Señorita","Justin Timberlake",,)
+(6,"La Bamba","Los Lobos",,)
+(7,"Sweet Like Cola","Lou Bega",,)
+(8,"Don't Stop The Music","Rihanna",,)
+(9,"Smooth","Santana feat. Rob Thomas",,)
+(10,"Superstition","Stevie Wonder",,)

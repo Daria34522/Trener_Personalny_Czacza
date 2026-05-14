@@ -43,6 +43,7 @@ class DBHandler:
             cursor = conn.cursor()
             cursor.execute("SELECT song_id, title, artist, audio_file FROM music WHERE song_id = ?", (music_id,))
             return cursor.fetchone()
+
     def get_all_song(self):
         with self.connect() as conn:
             cursor = conn.cursor()

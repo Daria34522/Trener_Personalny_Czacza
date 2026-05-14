@@ -1,1 +1,2 @@
-Muszę zmienić BLOBy na text żeby ścieżki zbierać, bo zrobiłem foldery na to
+zamienić minuty na sekundy w duration_minutes (dutation_seconds)
+pozmieniać obsługe bazy (dbhandler.py) żeby pasował do pozmienianej bazy
