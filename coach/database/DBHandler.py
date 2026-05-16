@@ -1,6 +1,4 @@
 import sqlite3
-import datetime
-
 
 class DBHandler:
     def __init__(self, db_path="db.sqlite"):
@@ -18,16 +16,16 @@ class DBHandler:
             return cursor.fetchall()
 
     def add_user(self, username, profile_photo=None):
-        created_at = datetime.now().strftime("%Y-%m-%d")
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (username, profile_photo, created_at) VALUES (?, ?, ?)", (username, profile_photo, created_at))
+            cursor.execute("INSERT INTO users (username, profile_photo, created_at) VALUES (?, ?, DATE('now'))", (username, profile_photo))
             conn.commit()
+            return cursor.lastrowid
 
     def delete_user(self, user_id):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM users WHERE user_id = ?", (user_id))
+            cursor.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
             conn.commit()
 
     #----------------------------------------------------------------------
@@ -44,7 +42,7 @@ class DBHandler:
             cursor.execute("SELECT song_id, title, artist, audio_file FROM music WHERE song_id = ?", (music_id,))
             return cursor.fetchone()
 
-    def get_all_song(self):
+    def get_all_songs(self):
         with self.connect() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT song_id, title, artist, audio_file FROM music")
@@ -52,56 +50,111 @@ class DBHandler:
 
     #----------------------------------------------------------------------
     # TrainingPlanHandler
-    def add_training_plan(self, user_id, training_date, goal, duration_minutes):
+    def add_training_plan(self, user_id, training_date, goal, duration_seconds):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO training_plan (user_id, date, goal, duration_minutes)
-                VALUES (?, ?, ?, ?)""", (user_id, training_date, goal, duration_minutes))
+            cursor.execute("""INSERT INTO training_plan (user_id, date, goal, duration_seconds)
+                VALUES (?, ?, ?, ?)""", (user_id, training_date, goal, duration_seconds))
             conn.commit()
+            return cursor.lastrowid
+
+    def get_training_plan_from_date(self, user_id, date):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""SELECT goal, duration_seconds FROM training_plan
+            WHERE user_id = ? AND "date" = ?""", (user_id,date))
+            return cursor.fetchall()
 
     def get_training_plans(self, user_id):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""SELECT training_plan_id, date, goal, duration_minutes
-                FROM training_plan WHERE user_id = ?
-                ORDER BY date DESC""", (user_id,))
+            cursor.execute("""SELECT "date", goal, duration_seconds FROM training_plan 
+                WHERE user_id = ? AND "date" > DATE('now') ORDER BY date ASC""", (user_id,))
             return cursor.fetchall()
 
     #------------------------------------------------------------------------------------
     # StatisticsHandler
-    def add_exercise_quality(self, tempo, step_accuracy, posture):
+
+    def add_statistics(self, user_id, training_date, repetitions, duration_seconds, comment, recording_file, tempo, step_accuracy, posture):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""INSERT INTO exercise_quality (tempo, step_accuracy, posture)
-                VALUES (?, ?, ?)""", (tempo, step_accuracy, posture))
+            cursor.execute("""INSERT INTO statistics (user_id, date, repetitions, duration_seconds, comment, recording_file, tempo, step_accuracy, posture)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", (user_id, training_date, repetitions, duration_seconds, comment, recording_file, tempo, step_accuracy, posture))
             conn.commit()
             return cursor.lastrowid
 
-    def add_statistics(self, user_id, quality_id, training_date, repetitions, duration_minutes, comment, recording_filename):
+    def get_statistics_between_dates(self, user_id, date_from, date_to):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""INSERT INTO statistics (
-            user_id, quality_id, date, repetitions, duration_minutes, comment, recording_filename
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)""", (
-            user_id, quality_id, training_date, repetitions, duration_minutes, comment, recording_filename
-            ))
-            conn.commit()
-            return cursor.lastrowid
+            cursor.execute("""SELECT * FROM statistics WHERE user_id = ? AND "date" BETWEEN ? AND ? ORDER BY s.date ASC""", (user_id, date_from, date_to))
+            return cursor.fetchall()
+
+    def get_statistics_from_date(self, user_id, date):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""SELECT * FROM statistics WHERE user_id = ? AND "date" = ?""", (user_id, date))
+            return cursor.fetchall()
+
+    def get_exercise_duration(self, user_id):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT SUM(duration_seconds) FROM statistics WHERE user_id = ?', (user_id,))
+            result = cursor.fetchone()
+            if result[0] is None:
+                return 0
+            return result[0]
 
     def get_statistics(self, user_id):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""SELECT 
-            s.statistics_id, s.date, s.repetitions, s.duration_minutes, s.comment, s.recording_filename,
-            q.tempo, q.step_accuracy, q.posture FROM statistics s
-            LEFT JOIN exercise_quality q ON s.quality_id = q.exercise_quality_id
-            WHERE s.user_id = ? ORDER BY s.date DESC
-            """, (user_id,))
+            cursor.execute("""SELECT * FROM statistics WHERE user_id = ? ORDER BY "date" ASC""", (user_id,))
             return cursor.fetchall()
-def main():
-    print("Welcome to DBHandler")
 
-
+"""
 if __name__ == "__main__":
-    main()
+    db = DBHandler("db.sqlite")
+    print("TESTY")
+
+    # ======================================================================
+    # TEST 1: Dodawanie i pobieranie użytkowników
+    # ======================================================================
+    print("1. Test UserHandler...")
+    db.add_user("Janek", "avatar1.png")
+    db.add_user("Ania", None)
+    users = db.get_all_users()
+    print(f"   Pobrani użytkownicy: {users}")
+
+    ania_id = users[1][0]
+    db.delete_user(ania_id)
+    print(f"   Użytkownicy po usunięciu Ani: {db.get_all_users()}")
+    print("-" * 50)
+
+    janek_id = users[0][0]
+
+    # ======================================================================
+    # TEST 2: Muzyka
+    # ======================================================================
+    print("2. Test MusicHandler...")
+    print(f"   Wszystkie utwory: {db.get_all_songs()}")
+    print(f"   Losowy utwór: {db.get_random_song()}")
+    print(f"   Utwór o ID 2: {db.get_chosen_song(2)}")
+    print("-" * 50)
+    
+    # ======================================================================
+    # TEST 3: Plany treningowe
+    # ======================================================================
+    print("3. Test TrainingPlanHandler...")
+    # Dodajemy plan na przeszłość i przyszł
+    
+    # ======================================================================
+    # TEST 4: Statystyki i Jakość ćwiczeń
+    # ======================================================================
+
+    print("4. Test StatisticsHandler...")
+    db.add_statistics(user_id=janek_id, training_date="2026-05-16", repetitions=20, duration_seconds=500, comment="Super trening", recording_file="wideo.mp4", tempo="Szybkie", step_accuracy="95%", posture="Dobra")
+    print(f"   Trening z dziś: {db.get_statistics_from_date(janek_id, '2026-05-16')}")
+    print(f"   Łączny czas (sekundy): {db.get_exercise_duration(janek_id)}")
+    print("-" * 50)
+
+    print("\n--- TESTY ZAKOŃCZONE SUKCESEM ---")
+"""
