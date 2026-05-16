@@ -27,12 +27,12 @@ class Settings(QMainWindow):
         self.ui.Confirm_selection.clicked.connect(self.confirmSelection)
 
     def loadSongsAsSelectableList(self):
-        # TODO połączenie z bazą i wpisanie tytułu oraz ścieżki do zmiennej
+        # TODO połączenie z bazą i wpisanie tytułu oraz ścieżki do 'rows'
         rows = [
             ("tytul1", "assets/music/1"),
             ("2", "assets/music/2"),
             ("3", "assets/music/3")
-        ] # Przykładowa zmienna
+        ] # Przykład
 
         for row in rows:
             tytul, sciezka = row  # Rozpakowujemy tytuł i ścieżkę

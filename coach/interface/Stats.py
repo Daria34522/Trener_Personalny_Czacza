@@ -38,12 +38,12 @@ class Stats(QMainWindow):
     def drawGraph(self):
         first_date = self.ui.From_date.text().split(".")
         second_date = self.ui.Until_date.text().split(".")
-        # TODO pobranie danych z bazy danych oraz narysowanie wykresu
+        # TODO pobranie danych z bazy oraz narysowanie wykresu
         pass
 
     def displayDayStats(self):
         date = self.ui.Selected_date.selectedDate().toString("dd-MM-yyyy").split("-")
-        # TODO pobranie danych z bazy danych oraz wyświetlenie danych
+        # TODO pobranie danych z bazy oraz wyświetlenie danych
         pass
 
     def userNameAndGeneralStatistic(self):
