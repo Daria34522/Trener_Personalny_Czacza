@@ -5,6 +5,44 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
+def loadImages(Window):
+    menu_button_style = """
+        QPushButton {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            padding: 50px;
+            outline: none;
+        }
+
+        QPushButton:hover {
+            background-color: #e9ecef;
+            border: 2px solid #00ff00;
+        }
+
+        QPushButton:pressed {
+            background-color: #d1d4d7;
+        }
+    """
+
+    # Konfiguracja przycisków
+    buttons = {
+        Window.ui.Start_training: "assets/icons/dancestart.png",
+        Window.ui.Settings: "assets/icons/settings.png",
+        Window.ui.Stats: "assets/icons/statistics.png",
+        Window.ui.Calendar: "assets/icons/calendar.png",
+        Window.ui.Tutorial: "assets/icons/recommendations.png",
+        Window.ui.Profile_selection: "assets/icons/profile.png"
+    }
+
+    from PySide6.QtGui import QIcon
+    from PySide6.QtCore import QSize
+
+    for btn, icon_path in buttons.items():
+        btn.setStyleSheet(menu_button_style)
+        btn.setIcon(QIcon(icon_path))
+        btn.setIconSize(QSize(128, 128))
+        btn.setText("")
 
 class MainMenu(QMainWindow):
     def __init__(self):
@@ -19,13 +57,15 @@ class MainMenu(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Menu główne")
+        loadImages(self) # ładowanie obrazków
+        self.showMaximized()
 
         # Łączenie przycisków z metodami
         self.ui.Start_training.clicked.connect(self.startTraining)
         self.ui.Settings.clicked.connect(self.settings)
         self.ui.Stats.clicked.connect(self.stats)
         self.ui.Calendar.clicked.connect(self.calendar)
-        self.ui.Recommendations.clicked.connect(self.recommendations)
+        self.ui.Tutorial.clicked.connect(self.tutorial)
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
 
     # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
@@ -44,7 +84,7 @@ class MainMenu(QMainWindow):
     def calendar(self):
         pass
 
-    def recommendations(self):
+    def tutorial(self):
         pass
 
     def profileSelection(self):

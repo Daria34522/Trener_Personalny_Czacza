@@ -7,14 +7,12 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayou
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
-
 def setup_camera_display(container, video_widget, session, camera): # 'Wrzucenie' obrazu z kamery do ui
     layout = QHBoxLayout(container)
     layout.setContentsMargins(0, 0, 0, 0)
     layout.addWidget(video_widget)
     session.setCamera(camera)
     session.setVideoOutput(video_widget)
-
 
 class CameraCalibration(QMainWindow):
     def __init__(self):

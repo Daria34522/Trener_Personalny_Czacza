@@ -13,22 +13,55 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="20,1">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>Ogólne</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="2,6">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,6">
        <item>
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Statystyki ogólne</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Czas ćwiczeń:   </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="Exercise_time">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -140,7 +173,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -154,6 +187,19 @@
          <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
