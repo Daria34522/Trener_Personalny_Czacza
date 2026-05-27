@@ -80,7 +80,6 @@ class PoseWorker(QObject):
         self.last_frame = frame
         self.detector.detect(frame, int(time.time() * 1000))
 
-
 class CameraCalibration(QMainWindow):
     def __init__(self):
         super().__init__()

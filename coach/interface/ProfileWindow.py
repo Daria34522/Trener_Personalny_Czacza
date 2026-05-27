@@ -3,42 +3,49 @@ import sys
 from sys import path
 
 from PIL import Image
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QFileDialog,
-    QWidget,
-    QLabel,
-    QPushButton,
-)
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, QSize
 
 
 def loadProfileImagesAndNames(Window):
+    profile_button_style = """
+        QPushButton {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 20px;
+            padding: 50px;
+            outline: none;
+        }
+
+        QPushButton:hover {
+            background-color: #e9ecef;
+            border: 2px solid #00ff00;
+        }
+
+        QPushButton:pressed {
+            background-color: #d1d4d7;
+        }
+    """
+
     for i in range(1, 7):
-        widget = Window.findChild(QPushButton, f"ProfileImage_{i}")
-        number = widget.objectName().replace("ProfileImage_", "")
+        btn = Window.findChild(QPushButton, f"ProfileImage_{i}")
+        if not btn:
+            continue
+        number = btn.objectName().replace("ProfileImage_", "")
 
-        # TODO Wczytanie obrazy oraz nazwy użytkownika
-        # Podczas każdego obrotu pętli ustawiany jest jeden blok tj. ikona i nazwa
-        user_name = "xyz"
-        img_path = "xyz"
+        # TODO: Wczytanie obrazu oraz nazwy użytkownika z bazy danych
+        user_name = "xyz" # przykładowa nazwa użytkownika
+        img_path = "assets/icons/profile.png" # przykładowa ścieżka
 
-        # Ustawianie obrazka oraz nazwy użytkownika dla jednego bloku
-        Window.findChild(QLabel, f"ProfileName_{number}").setText(user_name)
-        Window.findChild(QLabel, f"ProfileName_{i}").setStyleSheet(f"""
-            QPushButton {{
-                border: none;
-                background-image: url('{img_path}');
-                background-position: center;
-                background-repeat: no-repeat;
-            }}
-            QPushButton:hover {{
-                border: 2px solid #00ff00;
-            }}
-        """)
-
+        label = Window.findChild(QLabel, f"ProfileName_{number}")
+        if label:
+            label.setText(user_name)
+        btn.setStyleSheet(profile_button_style)
+        btn.setIcon(QIcon(img_path))
+        btn.setIconSize(QSize(128, 128))
+        btn.setText("")
 
 class ProfileWindow(QMainWindow):
     def __init__(self):
@@ -53,7 +60,8 @@ class ProfileWindow(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Wybór profilu")
-        loadProfileImagesAndNames(self)  # Ładowanie nazw użytkowików oraz zdjęć
+        loadProfileImagesAndNames(self) # Ładowanie nazw użytkowików oraz zdjęć
+        self.showMaximized()
 
         # Łączenie przycisków z metodami
         self.ui.Create_profile_button.clicked.connect(self.createProfile)

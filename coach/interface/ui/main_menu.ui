@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="5,10">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="3,10">
    <item>
     <widget class="QFrame" name="frame">
      <property name="frameShape">
@@ -38,7 +38,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="2,9">
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,20">
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -60,7 +60,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_4" stretch="2,9">
+        <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,20">
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
@@ -82,7 +82,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,9">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,20">
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
@@ -104,7 +104,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,9">
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,20">
          <item>
           <widget class="QLabel" name="label_4">
            <property name="text">
@@ -126,16 +126,16 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="2,9">
+        <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,20">
          <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Rekomendacje</string>
+            <string>Film instruktażowy</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="Recommendations"/>
+          <widget class="QPushButton" name="Tutorial"/>
          </item>
         </layout>
        </widget>
@@ -148,7 +148,7 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_7" stretch="2,9">
+        <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,20">
          <item>
           <widget class="QLabel" name="label_6">
            <property name="text">
