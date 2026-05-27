@@ -5,7 +5,7 @@ from PySide6.QtMultimedia import QCamera, QMediaCaptureSession
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
+from PySide6.QtCore import QFile, QDate
 
 
 class Stats(QMainWindow):
@@ -21,8 +21,14 @@ class Stats(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Statystyki")
+        self.showMaximized()
 
-        # TODO Wpisanie nazwy użytkownika w pole 'Zalogowany użytkownik:'
+        # Data domyślna
+        self.ui.From_date.setDate(QDate.currentDate())
+        self.ui.Until_date.setDate(QDate.currentDate())
+
+        # TODO Wpisanie nazwy użytkownika w pole 'Zalogowany użytkownik:' oraz statystyk ogólnych
+        self.userNameAndGeneralStatistic()
 
         # Łączenie przycisków z metodami
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
@@ -32,13 +38,18 @@ class Stats(QMainWindow):
     def drawGraph(self):
         first_date = self.ui.From_date.text().split(".")
         second_date = self.ui.Until_date.text().split(".")
-        # TODO pobranie danych z bazy danych oraz narysowanie wykresu
+        # TODO pobranie danych z bazy oraz narysowanie wykresu
         pass
 
     def displayDayStats(self):
         date = self.ui.Selected_date.selectedDate().toString("dd-MM-yyyy").split("-")
-        # TODO pobranie danych z bazy danych oraz wyświetlenie danych
+        # TODO pobranie danych z bazy oraz wyświetlenie danych
         pass
+
+    def userNameAndGeneralStatistic(self):
+        self.ui.Logged_user.setText("xyz") # Nazwa użytkownika
+        self.ui.Exercise_time.setText("xyz") # Czas ćwiczeń
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -1,0 +1,21 @@
+[33m2e3a63c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mInterface[m[33m)[m Dodanie menu ustawień tj. wyboru piosenki
+[33m78cf2cb[m Dodanie menu z filmem instruktażowym
+[33m63ca25c[m[33m ([m[1;31morigin/Interface[m[33m)[m Dodanie obrazków w przyciskach w menu głównym
+[33m78617ea[m naprawa merge conflictów
+[33m2f738c5[m Merge branch 'main' into Interface
+[33mb213439[m Merge branch 'Interface' of https://github.com/Daria34522/Trener_Personalny_Czacza into Interface Poprawki
+[33m9612315[m Poprawa przycisków w UI oraz błędów podczas ładowania danych użytkowników
+[33m0521c5a[m Voice control (#6)
+[33m6762bf2[m Dodanie menu wyboru profilu, menu głównego, statystyk oraz podglądu kamery (#5)
+[33m3d40639[m Dodanie Ikon
+[33ma4949c0[m Modyfikacja menu wyboru profilu poprzez dodanie obsługi zdjęć profilowych
+[33mdae6b6e[m Reogranizacja wyboru profilu
+[33m0374a99[m Poprawki menu obsługującego kalibracje kamery oraz dodanie menu statystyk
+[33mef3ca1b[m Poprawki
+[33mf91fff5[m Dodanie menu kalibracji kamer
+[33m7aa666e[m Dodanie menu głównego
+[33mc48191c[m Dodanie menu wyboru oraz tworzenia profilu'
+[33m708b1fe[m Utworzenie struktury projektu
+[33m48ace2e[m dodanie do materiałów pomocniczych AlfabetuCiała
+[33mf67dcad[m Utworzenie folderu na materiały pomocnicze
+[33m8946482[m Initial commit
