@@ -97,7 +97,7 @@ class PoseDrawer:
         ]
         self.important_points = frozenset({23, 24, 25, 26, 27, 28, 31, 32})
 
-    def draw(self, frame, landmarks):
+    def draw(self, frame, landmarks, pose_frame: bool = False):
         if landmarks is None:
             return frame
 
@@ -114,5 +114,15 @@ class PoseDrawer:
         for idx, pt in enumerate(pts):
             color = (0, 0, 255) if idx in self.important_points else (0, 255, 0)
             cv2.circle(frame, pt, 4, color, -1)
+
+        if pose_frame:
+            # Rysowanie ramki w srodku kamery gdzie użytkownik powinien się mieścić, takie 80% szerokości i 100% wysokości
+            cv2.rectangle(
+                frame,
+                (int(w * 0.1), int(h * 0.1)),
+                (int(w * 0.9), int(h * 0.9)),
+                (255, 255, 255),
+                2,
+            )
 
         return frame

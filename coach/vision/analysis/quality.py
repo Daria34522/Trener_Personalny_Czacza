@@ -30,7 +30,7 @@ def analyze_front(landmarks: list[SmoothedPoseResult]) -> QualityReport:
     """
     report = QualityReport()
 
-    if not landmarks or len(landmarks) <= PoseLandmark.RIGHT_WRIST:
+    if not landmarks:
         return report
 
     l_hip = landmarks[PoseLandmark.LEFT_HIP]
@@ -44,17 +44,6 @@ def analyze_front(landmarks: list[SmoothedPoseResult]) -> QualityReport:
 
     r_ankle = landmarks[PoseLandmark.RIGHT_ANKLE]
     l_ankle = landmarks[PoseLandmark.LEFT_ANKLE]
-
-    if (
-        l_hip.visibility < 0.8
-        or r_hip.visibility < 0.8
-        or l_wrist.visibility < 0.50
-        or r_wrist.visibility < 0.70
-        or l_shoulder.visibility < 0.8
-        or r_shoulder.visibility < 0.8
-    ):
-        report.issues.append(Issues.MALO_WIDOCZNY_W_KAMERACH)
-        return report
 
     hip_center_x = (l_hip.x + r_hip.x) / 2.0
     report.weight_shift = np.abs(hip_center_x - 0.5)
@@ -107,17 +96,6 @@ def analyze_side(landmarks: list[SmoothedPoseResult]) -> QualityReport:
     r_knee = landmarks[PoseLandmark.RIGHT_KNEE]
     r_ankle = landmarks[PoseLandmark.RIGHT_ANKLE]
     r_hip = landmarks[PoseLandmark.RIGHT_HIP]
-
-    if (
-        l_hip.visibility < 0.8
-        or r_hip.visibility < 0.8
-        or l_ankle.visibility < 0.15
-        or r_ankle.visibility < 0.70
-        or l_knee.visibility < 0.08
-        or r_knee.visibility < 0.44
-    ):
-        report.issues.append(Issues.MALO_WIDOCZNY_W_KAMERACH)
-        return report
 
     l_angle = maths.angle(l_hip, l_knee, l_ankle)
     r_angle = maths.angle(r_hip, r_knee, r_ankle)

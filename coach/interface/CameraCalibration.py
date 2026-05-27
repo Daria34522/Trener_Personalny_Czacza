@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sys
+import threading
 import time
 import numpy as np
 from PySide6.QtMultimedia import (
@@ -21,7 +22,21 @@ from coach.vision.analysis.quality import QualityReport
 from coach.vision.analysis.quality import analyze_front, analyze_side
 
 from collections import Counter
-from VoiceWorker import VoiceWorker
+from coach.interface.VoiceWorker import VoiceWorker
+
+
+class AtomicBoolean:
+    def __init__(self, initial: bool = False):
+        self._lock = threading.Lock()
+        self.value = initial
+
+    def toggle(self):
+        with self._lock:
+            self.value = not self.value
+
+    def get(self) -> bool:
+        with self._lock:
+            return self.value
 
 
 class PoseWorker(QObject):
@@ -33,6 +48,7 @@ class PoseWorker(QObject):
         self.detector = PoseDetector(result_callback=self.on_pose_result)
         self.smoother = PoseLandmarkSmoother(alpha=0.3)
         self.drawer = PoseDrawer()
+        self.user_calibration = AtomicBoolean(True)
         self.direction = direction
         self.last_frame = None
 
@@ -44,14 +60,17 @@ class PoseWorker(QObject):
             return
 
         landmarks = self.smoother.smooth(result.pose_landmarks[0])
-        if self.direction == "front":
-            result = analyze_front(landmarks)
-        else:
-            result = analyze_side(landmarks)
+        if not self.user_calibration.get():
+            if self.direction == "front":
+                result = analyze_front(landmarks)
+            else:
+                result = analyze_side(landmarks)
 
-        self.quality_result.emit(result)
+            self.quality_result.emit(result)
 
-        processed = self.drawer.draw(self.last_frame.copy(), landmarks)
+        processed = self.drawer.draw(
+            self.last_frame.copy(), landmarks, self.user_calibration.get()
+        )
         h, w, ch = processed.shape
         q_img = QImage(processed.data, w, h, ch * w, QImage.Format.Format_RGB888)
         self.image_processed.emit(q_img.copy())
@@ -78,8 +97,11 @@ class CameraCalibration(QMainWindow):
         self.voice = VoiceWorker()
 
         # TODO Do przetestowania czy chcemy mieć kamerki 16:9 czy 4:3 oraz dopasowanie do tego interfejsu
-        self.ui.Camera_front.setFixedSize(640, 360)
-        self.ui.Camera_side.setFixedSize(640, 360)
+        # trzeba to podzielić na 2 równe częsci kamerek pionowych z telefonów, rozdzielczoć kamer to 720x1280, a monitora 1920x1080
+        self.ui.Camera_front.setFixedSize(480, 640)
+        self.ui.Camera_side.setFixedSize(480, 640)
+        # self.ui.Camera_front.setFixedSize(640, 360)
+        # self.ui.Camera_side.setFixedSize(640, 360)
 
         self.worker_front = PoseWorker("front")
         self.worker_front.image_processed.connect(self.update_display_front)
@@ -102,17 +124,19 @@ class CameraCalibration(QMainWindow):
             self.messageToUser(
                 "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
             )
-            self.voice.say("Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie.")
+            # self.voice.say(
+            #     "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
+            # )
             return
 
-        self.camera1 = QCamera(cameras[0])  # obraz z kamerki
+        self.camera1 = QCamera(cameras[1])  # obraz z kamerki
         self.session1 = QMediaCaptureSession()
         self.sink1 = QVideoSink()
         self.session1.setCamera(self.camera1)
         self.session1.setVideoSink(self.sink1)
         self.sink1.videoFrameChanged.connect(self.handle_camera_frame_front)
 
-        self.camera2 = QCamera(cameras[1])  # obraz z kamerki
+        self.camera2 = QCamera(cameras[0])  # obraz z kamerki
         self.session2 = QMediaCaptureSession()
         self.sink2 = QVideoSink()
         self.session2.setCamera(self.camera2)
@@ -157,28 +181,28 @@ class CameraCalibration(QMainWindow):
         show_issues = []
         for issue, count in combined_counter.most_common():
             if (
-                count > 70
+                count > 14
             ):  # jeśli dany problem pojawił się więcej niż 14 razy, wyświetl go użytkownikowi
                 show_issues.append(issue)
 
-        if len(self.issues_per_frame) > 150:
+        if len(self.issues_per_frame) > 30:
             self.issues_per_frame.pop(0)
 
         # TODO: komunikaty głosowe dla użytkownika o błędach
-        for issue in show_issues:
-            self.voice.say(issue)
+        # for issue in show_issues:
+        #     self.voice.say(issue)
         self.messageToUser("\n".join(show_issues))
 
     @Slot(QImage)
     def update_display_front(self, q_img):
-        pixmap = QPixmap.fromImage(q_img).transformed(QTransform().scale(-1, 1))
+        pixmap = QPixmap.fromImage(q_img)
         self.label_front.setPixmap(
             pixmap.scaled(self.label_front.size(), Qt.AspectRatioMode.KeepAspectRatio)
         )
 
     @Slot(QImage)
     def update_display_side(self, q_img):
-        pixmap = QPixmap.fromImage(q_img).transformed(QTransform().scale(-1, 1))
+        pixmap = QPixmap.fromImage(q_img)
         self.label_side.setPixmap(
             pixmap.scaled(self.label_side.size(), Qt.AspectRatioMode.KeepAspectRatio)
         )
