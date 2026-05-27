@@ -1,3 +1,4 @@
+import os
 import sys
 from sys import path
 
@@ -50,7 +51,7 @@ class ProfileWindow(QMainWindow):
     def __init__(self):
         # Ładowanie pliku .ui
         super().__init__()
-        ui_path = "ui/profile_selection_menu.ui"
+        ui_path = f"{os.path.dirname(__file__)}/ui/profile_selection_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
         if not ui_file.open(QFile.ReadOnly):

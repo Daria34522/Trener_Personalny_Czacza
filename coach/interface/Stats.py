@@ -1,3 +1,4 @@
+import os
 import sys
 from sys import path
 
@@ -12,7 +13,7 @@ class Stats(QMainWindow):
     def __init__(self):
         # Ładowanie pliku .ui
         super().__init__()
-        ui_path = "ui/Stats_menu.ui"
+        ui_path = f"{os.path.dirname(__file__)}/ui/Stats_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
         if not ui_file.open(QFile.ReadOnly):
