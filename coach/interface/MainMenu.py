@@ -5,6 +5,7 @@ from sys import path
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from VoiceWorker import VoiceWorker
 
 def loadImages(Window):
     menu_button_style = """
@@ -68,6 +69,9 @@ class MainMenu(QMainWindow):
         self.ui.Calendar.clicked.connect(self.calendar)
         self.ui.Tutorial.clicked.connect(self.tutorial)
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
+        self.voice = VoiceWorker()
+        self.voice.say("Witaj w asystencie czaczy. Wybierz co chcesz zrobić")
+
 
     # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
     pass

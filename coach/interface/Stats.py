@@ -7,7 +7,7 @@ from PySide6.QtMultimediaWidgets import QVideoWidget
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QDate
-
+from VoiceWorker import VoiceWorker
 
 class Stats(QMainWindow):
     def __init__(self):
@@ -34,6 +34,8 @@ class Stats(QMainWindow):
         # Łączenie przycisków z metodami
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
+        self.voice = VoiceWorker()
+        self.voice.say("Oto twoje statystyki")
 
     # Daty pobrane z ui zapisane są w tablicy posiadającej 3 elementy typu String tj. dzień, miesiąc, rok
     def drawGraph(self):

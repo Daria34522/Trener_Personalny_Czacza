@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from sys import path
 import sys
 import threading
 import time
@@ -144,6 +145,8 @@ class CameraCalibration(QMainWindow):
 
         self.camera1.start()
         self.camera2.start()
+        self.voice = VoiceWorker()
+        self.voice.say("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
 
     def setup_camera_ui(self, container, label):
         layout = QHBoxLayout(container)
