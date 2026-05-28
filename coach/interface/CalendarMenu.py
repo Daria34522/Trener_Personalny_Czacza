@@ -6,6 +6,7 @@ from PySide6.QtGui import QIcon, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QFrame, QHBoxLayout
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, QDate
+from VoiceWorker import VoiceWorker
 
 class CalendarMenu(QMainWindow):
     def __init__(self):
@@ -27,6 +28,9 @@ class CalendarMenu(QMainWindow):
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
         self.ui.Calendar1.clicked.connect(self.selectedDate)
+
+        self.voice = VoiceWorker()
+        self.voice.say("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
 
     def loadTrainingList(self): # Pokazanie całej listy treningowej
         # TODO połączenie z bazą danych oraz pobranie wszystkich planów treningowych które odbędą się w przyszłości
