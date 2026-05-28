@@ -2,12 +2,20 @@ import os
 import sys
 from sys import path
 
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+from database.DBHandler import DBHandler
+
 from PIL import Image
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize
 
+db = DBHandler("database.db.sqlite")
 
 def loadProfileImagesAndNames(Window):
     profile_button_style = """
@@ -97,6 +105,7 @@ class ProfileWindow(QMainWindow):
             return
 
         # TODO Komunikacja z bazą danych oraz stworzenie profilu
+        db.add_user(user_name, image_path)
         pass
 
         # Wczytanie obrazków i nazw do UI
