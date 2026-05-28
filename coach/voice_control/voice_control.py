@@ -4,6 +4,9 @@ import pygame
 import time
 import speech_recognition as sr
 
+pygame.mixer.init()
+pygame.mixer.set_num_channels(2)
+
 # Klasa nasłuchująca co mówi użytkownik
 class Listener:
     def __init__(self, language = "pl"):
@@ -42,12 +45,12 @@ class Speaker:
         tts.save(self.voice_filename)
 
     # Funkcja mówiąca
-    def speak(self):
-        pygame.mixer.music.load(self.voice_filename)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            time.sleep(0.1)
-        pygame.mixer.music.unload()
+    def speak(self, chanel_id, volume= 1.0):
+        sound = pygame.mixer.Sound(self.voice_filename)
+        channel = pygame.mixer.Channel(chanel_id)
+        channel.set_volume(volume)
+        channel.play()
+        return channel
 
     # Kasowanie pliku audio
     def delete_file(self):
