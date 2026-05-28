@@ -92,7 +92,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="9,1">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="20,0">
            <item>
             <widget class="QPushButton" name="ProfileImage_1">
              <property name="text">
@@ -121,7 +121,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="9,1">
+          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="20,0">
            <item>
             <widget class="QPushButton" name="ProfileImage_2">
              <property name="text">
@@ -150,7 +150,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="9,1">
+          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="20,0">
            <item>
             <widget class="QPushButton" name="ProfileImage_3">
              <property name="text">
@@ -183,7 +183,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="9,1">
+          <layout class="QVBoxLayout" name="verticalLayout_7" stretch="20,0">
            <item>
             <widget class="QPushButton" name="ProfileImage_4">
              <property name="text">
@@ -212,7 +212,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8" stretch="9,1">
+          <layout class="QVBoxLayout" name="verticalLayout_8" stretch="20,0">
            <item>
             <widget class="QPushButton" name="ProfileImage_5">
              <property name="text">
@@ -241,7 +241,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_9" stretch="9,1">
+          <layout class="QVBoxLayout" name="verticalLayout_9" stretch="20,0">
            <item>
             <widget class="QPushButton" name="ProfileImage_6">
              <property name="text">
