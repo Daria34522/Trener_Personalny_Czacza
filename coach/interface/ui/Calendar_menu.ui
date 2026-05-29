@@ -115,7 +115,7 @@
                <x>0</x>
                <y>0</y>
                <width>540</width>
-               <height>210</height>
+               <height>208</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_6"/>
@@ -222,6 +222,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Main_menu">
+       <property name="text">
+        <string>Menu główne</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

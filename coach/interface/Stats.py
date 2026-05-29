@@ -33,6 +33,7 @@ class Stats(QMainWindow):
         # Łączenie przycisków z metodami
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
     # Daty pobrane z ui zapisane są w tablicy posiadającej 3 elementy typu String tj. dzień, miesiąc, rok
     def drawGraph(self):
@@ -49,6 +50,9 @@ class Stats(QMainWindow):
     def userNameAndGeneralStatistic(self):
         self.ui.Logged_user.setText("xyz") # Nazwa użytkownika
         self.ui.Exercise_time.setText("xyz") # Czas ćwiczeń
+
+    def backToMainMenu(self):
+        pass
 
 
 if __name__ == "__main__":

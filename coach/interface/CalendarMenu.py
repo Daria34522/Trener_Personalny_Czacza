@@ -27,6 +27,7 @@ class CalendarMenu(QMainWindow):
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
         self.ui.Calendar1.clicked.connect(self.selectedDate)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
     def loadTrainingList(self): # Pokazanie całej listy treningowej
         # TODO połączenie z bazą danych oraz pobranie wszystkich planów treningowych które odbędą się w przyszłości
@@ -113,6 +114,9 @@ class CalendarMenu(QMainWindow):
         else:
             self.ui.Target_2.setText(Target)
             self.ui.Time_2.setText(Czas)
+
+    def backToMainMenu(self):
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

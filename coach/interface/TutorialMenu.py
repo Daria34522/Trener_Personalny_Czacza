@@ -36,7 +36,7 @@ class TutorialMenu(QMainWindow):
 
         # łączenie przycisków z metodami
         self.ui.btn_play.clicked.connect(self.toggle_play)
-        self.ui.backto_main_menu.clicked.connect(self.backto_main_menu)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
         # obsługa wideo
         self.player.positionChanged.connect(lambda p: self.ui.video_slider.setValue(int(p)))
@@ -67,7 +67,7 @@ class TutorialMenu(QMainWindow):
         self.audio_output.setVolume(float_volume)
 
     #TODO implementacja cofania do menu głównego
-    def backto_main_menu(self):
+    def backToMainMenu(self):
         pass
 
 if __name__ == "__main__":
