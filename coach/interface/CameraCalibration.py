@@ -15,9 +15,9 @@ def setup_camera_display(container, video_widget, session, camera): # 'Wrzucenie
     session.setVideoOutput(video_widget)
 
 class CameraCalibration(QMainWindow):
-    def __init__(self):
-        # Ładowanie pliku .ui
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
         ui_path = "ui/camera_calibration_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -50,6 +50,7 @@ class CameraCalibration(QMainWindow):
 
     def messageToUser(self, message): # metoda pozwala wyświetlić komunikat dla użytkownika w polu 'Informacje' np. o niepoprawnym ustawieniu kamery
         self.ui.Message_from_app.setText(message)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

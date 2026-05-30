@@ -8,9 +8,10 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, QDate
 
 class CalendarMenu(QMainWindow):
-    def __init__(self):
-        # Ładowanie pliku .ui
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
+        # Ładowanie pliku .ui
         ui_path = "ui/Calendar_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -24,10 +25,16 @@ class CalendarMenu(QMainWindow):
         self.loadTrainingList()
         self.selectedDate()
 
+        user_id = -1 # ID użytkownika
+
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
         self.ui.Calendar1.clicked.connect(self.selectedDate)
         self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
+
+    def setUserName(self):
+        #TODO Pobranie z bazy danych
+        self.ui.Logged_user.setText("xyz") # Nazwa użytkownika
 
     def loadTrainingList(self): # Pokazanie całej listy treningowej
         # TODO połączenie z bazą danych oraz pobranie wszystkich planów treningowych które odbędą się w przyszłości
@@ -84,9 +91,8 @@ class CalendarMenu(QMainWindow):
         minutes = Time.minute()
         seconds = Time.second()
         # Wybrany dzień
-        dzien = Date.day()
-        miesiac = Date.month()
-        rok = Date.year()
+        parsed_date = Date.toString("dd-MM-yyyy").split("-")
+        print(parsed_date)
 
         if Target == "" or Date < QDate.currentDate():
             self.ui.Message.setText("Cel jest pusty lub data jest z przeszłości")
@@ -99,9 +105,8 @@ class CalendarMenu(QMainWindow):
     def selectedDate(self): # Wypisanie planu na wybrany dzień
         Date = self.ui.Calendar1.selectedDate()
         # Wybrany dzień
-        dzien = Date.day()
-        miesiac = Date.month()
-        rok = Date.year()
+        parsed_date = Date.toString("dd-MM-yyyy").split("-")
+        print(parsed_date)
 
         # TODO połączenie z bazą i pobranie planu na konkretny dzień
         pass
@@ -115,8 +120,11 @@ class CalendarMenu(QMainWindow):
             self.ui.Target_2.setText(Target)
             self.ui.Time_2.setText(Czas)
 
+    def setProfile(self, user):
+        self.user_id = user
+
     def backToMainMenu(self):
-        pass
+        self.parent().setCurrentIndex(0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

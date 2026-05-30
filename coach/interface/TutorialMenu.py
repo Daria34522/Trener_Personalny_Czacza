@@ -8,8 +8,9 @@ from PySide6.QtMultimediaWidgets import QVideoWidget  # Prawdziwa klasa wideo
 
 
 class TutorialMenu(QMainWindow):
-    def __init__(self):
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
         ui_path = "ui/TutorialMenu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -68,7 +69,8 @@ class TutorialMenu(QMainWindow):
 
     #TODO implementacja cofania do menu głównego
     def backToMainMenu(self):
-        pass
+        self.parent().setCurrentIndex(0)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

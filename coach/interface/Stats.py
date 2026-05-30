@@ -9,9 +9,9 @@ from PySide6.QtCore import QFile, QDate
 
 
 class Stats(QMainWindow):
-    def __init__(self):
-        # Ładowanie pliku .ui
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
         ui_path = "ui/Stats_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -27,7 +27,6 @@ class Stats(QMainWindow):
         self.ui.From_date.setDate(QDate.currentDate())
         self.ui.Until_date.setDate(QDate.currentDate())
 
-        # TODO Wpisanie nazwy użytkownika w pole 'Zalogowany użytkownik:' oraz statystyk ogólnych
         self.userNameAndGeneralStatistic()
 
         # Łączenie przycisków z metodami
@@ -44,15 +43,20 @@ class Stats(QMainWindow):
 
     def displayDayStats(self):
         date = self.ui.Selected_date.selectedDate().toString("dd-MM-yyyy").split("-")
+        print(date)
         # TODO pobranie danych z bazy oraz wyświetlenie danych
         pass
 
     def userNameAndGeneralStatistic(self):
+        #TODO Pobranie z bazy danych
         self.ui.Logged_user.setText("xyz") # Nazwa użytkownika
         self.ui.Exercise_time.setText("xyz") # Czas ćwiczeń
 
+    def setProfile(self, user):
+        self.user_id = user
+
     def backToMainMenu(self):
-        pass
+        self.parent().setCurrentIndex(0)
 
 
 if __name__ == "__main__":
