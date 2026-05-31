@@ -11,8 +11,6 @@ class TestErrorDetector(unittest.TestCase):
         for _ in range(3):
             detect.update([Issues.RECE_ZA_NISKO])
 
-        print(detect.is_active(Issues.RECE_ZA_NISKO))
-
         assert detect.is_active(Issues.RECE_ZA_NISKO)
 
     def test_error_while_below_threshold(self):
