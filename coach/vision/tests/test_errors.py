@@ -10,6 +10,7 @@ class TestErrorDetector(unittest.TestCase):
 
         for _ in range(3):
             detect.update([Issues.RECE_ZA_NISKO])
+            detect.tick()
 
         assert detect.is_active(Issues.RECE_ZA_NISKO)
 
@@ -18,5 +19,6 @@ class TestErrorDetector(unittest.TestCase):
 
         for _ in range(2):
             detect.update([Issues.RECE_ZA_NISKO])
+            detect.tick()
 
         assert not detect.is_active(Issues.RECE_ZA_NISKO)
