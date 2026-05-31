@@ -1,6 +1,7 @@
 import os.path
 from gtts import gTTS
 import pygame
+import pyaudio
 import time
 import speech_recognition as sr
 from PySide6.QtCore import QMutex
@@ -14,22 +15,27 @@ class Listener:
         self.language = language
         self.recognizer = sr.Recognizer()
 
+        self.microphone = sr.Microphone()
+        self.source = self.microphone.__enter__()
+        self.recognizer.energy_threshold = 200
+        self.recognizer.adjust_for_ambient_noise(self.source, duration=0.5)
+
     # Zwracanie jako tekstu tego co mówi użytkownik
     def listen(self):
-        with sr.Microphone() as source:
-            self.recognizer.energy_threshold = 200
-            self.recognizer.adjust_for_ambient_noise(source, duration=0.5)
+        try:
+            audio = self.recognizer.listen(self. source, timeout=5, phrase_time_limit=5)
+            text = self.recognizer.recognize_google(audio, language=self.language)
+            return text
+        except sr.WaitTimeoutError:
+            return "Nic nie powiedziano."
+        except sr.UnknownValueError:
+            return "Nie zrozumiano. Powtórz"
+        except sr.RequestError as e:
+            return e
+        finally:
+            self.microphone.__exit__(None, None, None)
+            self.source = None
 
-            try:
-                audio = self.recognizer.listen(source, timeout=5, phrase_time_limit=5)
-                text = self.recognizer.recognize_google(audio, language=self.language)
-                return text
-            except sr.WaitTimeoutError:
-                return "Nic nie powiedziano."
-            except sr.UnknownValueError:
-                return "Nie zrozumiano. Powtórz"
-            except sr.RequestError as e:
-                return e
 
 # Obsługa mowy asystenta
 class Speaker:
