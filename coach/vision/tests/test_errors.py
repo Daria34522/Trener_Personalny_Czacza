@@ -62,6 +62,7 @@ class TestErrorDetector(unittest.TestCase):
             detect.update([Issues.KOLANO_UGIETE, Issues.RECE_ZA_NISKO])
 
         active = detect.get_active_errors()
+        assert any(active)
         assert Issues.KOLANO_UGIETE in active
         assert Issues.RECE_ZA_NISKO in active
 
@@ -72,5 +73,10 @@ class TestErrorDetector(unittest.TestCase):
             detect.update([Issues.KOLANO_UGIETE, Issues.RECE_ZA_NISKO])
 
         active = detect.get_active_errors()
+        assert not any(active)
         assert Issues.KOLANO_UGIETE not in active
         assert Issues.RECE_ZA_NISKO not in active
+
+    def test_get_active_errors_empty(self):
+        detect = ErrorDetector(window_size=15, threshold=3)
+        assert not any(detect.get_active_errors())
