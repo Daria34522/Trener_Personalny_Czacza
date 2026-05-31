@@ -22,3 +22,7 @@ class TestErrorDetector(unittest.TestCase):
             detect.tick()
 
         assert not detect.is_active(Issues.RECE_ZA_NISKO)
+
+    def test_error_while_never_added(self):
+        detect = ErrorDetector(window_size=15, threshold=3)
+        assert not detect.is_active(Issues.RECE_ZA_NISKO)
