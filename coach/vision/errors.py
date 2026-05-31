@@ -22,3 +22,6 @@ class ErrorDetector:
     def is_active(self, issue: Issues) -> bool:
         window = self._windows.get(issue)
         return bool(window) and sum(window) >= self.threshold
+
+    def get_active_errors(self) -> list[Issues]:
+        return [issue for issue in self._windows if self.is_active(issue)]
