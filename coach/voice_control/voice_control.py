@@ -39,11 +39,14 @@ class Speaker:
 
     def __init__(self, lang ="pl", voice_filename= "voice.mp3", channel_id = 0):
         self.lang = lang
-        self.channel_id = channel_id
+        self.voice_filename = voice_filename
         now_dir = os.path.dirname(os.path.abspath(__file__))
-        self.folder = os.path.join(now_dir, "voice_records")
-        self.voice_filename = os.path.join(self.folder, voice_filename + ".mp3")
-        pygame.mixer.init()
+        if channel_id == 0:
+            self.folder = os.path.join(now_dir, "voice_records")
+        else:
+            self.folder = os.path.join(now_dir, "../database/music")
+        self.voice_filename = os.path.join(self.folder, self.voice_filename + ".mp3")
+
 
     # Tworzenie pliku audio
     def gen_speak(self, text):
@@ -51,14 +54,15 @@ class Speaker:
         tts.save(self.voice_filename)
 
     # Funkcja mówiąca
-    def speak(self, chanel_id, volume=1.0):
-        lock = self._channel_locks.get(chanel_id)
+    def speak(self, channel_id, volume=1.0):
+        pygame.mixer.init()
+        lock = self._channel_locks.get(channel_id)
         if lock:
             lock.lock()
 
         try:
             sound = pygame.mixer.Sound(self.voice_filename)
-            channel = pygame.mixer.Channel(chanel_id)
+            channel = pygame.mixer.Channel(channel_id)
             channel.set_volume(volume)
 
             channel.play(sound)
