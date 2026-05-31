@@ -48,7 +48,7 @@ class TutorialMenu(QMainWindow):
         self.ui.volume_slider.setValue(50)
         self.ui.volume_slider.valueChanged.connect(self.change_volume)
 
-        self.player.setSource(QUrl.fromLocalFile("assets/videos/tutorial.mp4")) # Ładowanie pliku mp4
+        self.player.setSource(QUrl.fromLocalFile("tutorial/tut.mp4")) # Ładowanie pliku mp4
 
         # Czekanie na załadowanie pliku i odpalenie pierwszej klatki
         time.sleep(0.2)
