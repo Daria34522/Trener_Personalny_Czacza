@@ -10,7 +10,6 @@ class TestErrorDetector(unittest.TestCase):
 
         for _ in range(3):
             detect.update([Issues.RECE_ZA_NISKO])
-            detect.tick()
 
         assert detect.is_active(Issues.RECE_ZA_NISKO)
 
@@ -19,7 +18,6 @@ class TestErrorDetector(unittest.TestCase):
 
         for _ in range(2):
             detect.update([Issues.RECE_ZA_NISKO])
-            detect.tick()
 
         assert not detect.is_active(Issues.RECE_ZA_NISKO)
 
@@ -32,11 +30,9 @@ class TestErrorDetector(unittest.TestCase):
 
         for _ in range(3):
             detect.update([Issues.RECE_ZA_NISKO])
-            detect.tick()
 
         for _ in range(3):
             detect.update([])
-            detect.tick()
 
         assert not detect.is_active(Issues.RECE_ZA_NISKO)
 
@@ -45,7 +41,16 @@ class TestErrorDetector(unittest.TestCase):
 
         for _ in range(3):
             detect.update([Issues.RECE_ZA_NISKO])
-            detect.tick()
 
         assert detect.is_active(Issues.RECE_ZA_NISKO)
         assert not detect.is_active(Issues.KOLANO_UGIETE)
+
+    def test_error_from_two_updates(self):
+        detect = ErrorDetector(window_size=15, threshold=3)
+
+        for _ in range(3):
+            detect.update([Issues.KOLANO_UGIETE])
+            detect.update([Issues.RECE_ZA_NISKO])
+
+        assert detect.is_active(Issues.KOLANO_UGIETE)
+        assert detect.is_active(Issues.RECE_ZA_NISKO)
