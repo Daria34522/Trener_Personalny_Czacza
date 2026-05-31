@@ -90,3 +90,14 @@ class TestErrorDetector(unittest.TestCase):
         alerts = detect.show_alerts()
         assert any(alerts)
         assert Issues.KOLANO_UGIETE in alerts
+
+    def test_show_alerts_respects_cooldown(self):
+        detect = ErrorDetector(window_size=15, threshold=3, cooldown_frames=10)
+
+        for _ in range(3):
+            detect.update([Issues.KOLANO_UGIETE])
+
+        assert any(detect.show_alerts())
+
+        detect.update([Issues.KOLANO_UGIETE])
+        assert not detect.show_alerts()
