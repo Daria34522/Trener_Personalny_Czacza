@@ -39,3 +39,13 @@ class TestErrorDetector(unittest.TestCase):
             detect.tick()
 
         assert not detect.is_active(Issues.RECE_ZA_NISKO)
+
+    def test_two_errors_independent(self):
+        detect = ErrorDetector(window_size=15, threshold=3)
+
+        for _ in range(3):
+            detect.update([Issues.RECE_ZA_NISKO])
+            detect.tick()
+
+        assert detect.is_active(Issues.RECE_ZA_NISKO)
+        assert not detect.is_active(Issues.KOLANO_UGIETE)
