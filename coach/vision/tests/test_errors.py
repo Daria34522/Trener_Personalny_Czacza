@@ -80,3 +80,13 @@ class TestErrorDetector(unittest.TestCase):
     def test_get_active_errors_empty(self):
         detect = ErrorDetector(window_size=15, threshold=3)
         assert not any(detect.get_active_errors())
+
+    def test_show_alerts_returns_active_errors(self):
+        detect = ErrorDetector(window_size=15, threshold=3, cooldown_frames=10)
+
+        for _ in range(3):
+            detect.update([Issues.KOLANO_UGIETE])
+
+        alerts = detect.show_alerts()
+        assert any(alerts)
+        assert Issues.KOLANO_UGIETE in alerts
