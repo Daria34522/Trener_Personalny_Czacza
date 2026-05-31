@@ -10,10 +10,8 @@ class ErrorDetector:
         self._windows: dict[Issues, deque] = {}
         self._frame = 0
 
-    def tick(self) -> None:
-        self._frame += 1
-
     def update(self, issues: list[Issues]) -> None:
+        self._frame += 1
         all_issues = set(issues) | set(self._windows.keys())
 
         for issue in all_issues:
