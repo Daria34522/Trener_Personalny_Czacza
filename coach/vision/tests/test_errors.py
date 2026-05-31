@@ -147,3 +147,39 @@ class TestErrorDetector(unittest.TestCase):
         assert any(alerts)
         assert Issues.KOLANO_UGIETE in alerts
         assert Issues.RECE_ZA_NISKO not in alerts
+
+    def test_real_two_cameras_scenario(self):
+        detect = ErrorDetector(window_size=60, threshold=10, cooldown_frames=240)
+
+        # kamera z przodu
+        for _ in range(15):
+            detect.update([Issues.ZA_DLUGI_KROK])
+            detect.update([])
+
+        # kamera z boku
+        for _ in range(30):
+            detect.update([])
+
+        alerts = detect.show_alerts()
+        assert any(alerts)
+        assert Issues.ZA_DLUGI_KROK in alerts
+
+        # kamera z przodu
+        for _ in range(30):
+            detect.update([])
+
+        # kamera z boku
+        for _ in range(15):
+            detect.update([Issues.ZA_GLEBOKI_KROK])
+            detect.update([])
+
+        alerts = detect.show_alerts()
+        assert any(alerts)
+        assert Issues.ZA_DLUGI_KROK not in alerts
+        assert Issues.ZA_GLEBOKI_KROK in alerts
+
+        for _ in range(3):
+            detect.update([Issues.BIODRA_NIEROWNE])
+            detect.update([])
+
+        assert not any(detect.show_alerts())
