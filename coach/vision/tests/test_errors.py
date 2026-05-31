@@ -128,3 +128,22 @@ class TestErrorDetector(unittest.TestCase):
             detect.update([Issues.KOLANO_UGIETE])
 
         assert not any(detect.show_alerts())
+
+    def test_two_errors_independent_cooldown(self):
+        detect = ErrorDetector(window_size=5, threshold=3, cooldown_frames=10)
+
+        for _ in range(3):
+            detect.update([Issues.KOLANO_UGIETE, Issues.RECE_ZA_NISKO])
+
+        alerts = detect.show_alerts()
+        assert any(alerts)
+        assert Issues.KOLANO_UGIETE in alerts
+        assert Issues.RECE_ZA_NISKO in alerts
+
+        for _ in range(10):
+            detect.update([Issues.KOLANO_UGIETE])
+
+        alerts = detect.show_alerts()
+        assert any(alerts)
+        assert Issues.KOLANO_UGIETE in alerts
+        assert Issues.RECE_ZA_NISKO not in alerts
