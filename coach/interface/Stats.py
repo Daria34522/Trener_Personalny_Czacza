@@ -10,9 +10,9 @@ from PySide6.QtCore import QFile, QDate
 from VoiceWorker import VoiceWorker
 
 class Stats(QMainWindow):
-    def __init__(self):
-        # Ładowanie pliku .ui
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
         ui_path = f"{os.path.dirname(__file__)}/ui/Stats_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -28,12 +28,12 @@ class Stats(QMainWindow):
         self.ui.From_date.setDate(QDate.currentDate())
         self.ui.Until_date.setDate(QDate.currentDate())
 
-        # TODO Wpisanie nazwy użytkownika w pole 'Zalogowany użytkownik:' oraz statystyk ogólnych
         self.userNameAndGeneralStatistic()
 
         # Łączenie przycisków z metodami
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
         self.voice = VoiceWorker()
         self.voice.say("Oto twoje statystyki")
 
@@ -46,12 +46,20 @@ class Stats(QMainWindow):
 
     def displayDayStats(self):
         date = self.ui.Selected_date.selectedDate().toString("dd-MM-yyyy").split("-")
+        print(date)
         # TODO pobranie danych z bazy oraz wyświetlenie danych
         pass
 
     def userNameAndGeneralStatistic(self):
-        self.ui.Logged_user.setText("xyz") # Nazwa użytkownika
-        self.ui.Exercise_time.setText("xyz") # Czas ćwiczeń
+        # TODO Pobranie z bazy danych
+        self.ui.Logged_user.setText("xyz")  # Nazwa użytkownika
+        self.ui.Exercise_time.setText("xyz")  # Czas ćwiczeń
+
+    def setProfile(self, user):
+        self.user_id = user
+
+    def backToMainMenu(self):
+        self.parent().setCurrentIndex(0)
 
 
 if __name__ == "__main__":

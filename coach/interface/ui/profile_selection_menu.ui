@@ -13,67 +13,110 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="2,5">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,5">
    <item>
-    <widget class="QGroupBox" name="Create_profile_menu">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Stwórz profil</string>
+      <string>Mendżer profilów</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1">
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="User_name_label">
-          <property name="text">
-           <string>Nazwa użytkownika</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="User_name"/>
-        </item>
-       </layout>
+       <widget class="QGroupBox" name="Create_profile_menu">
+        <property name="title">
+         <string>Stwórz profil</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="User_name_label">
+             <property name="text">
+              <string>Nazwa użytkownika</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="User_name"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="10,0,100">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Wybierz zdjęcie</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="Browse">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="Path"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1">
+           <item>
+            <widget class="QPushButton" name="Create_profile_button">
+             <property name="text">
+              <string>Stwórz profil</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="10,0,100">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Wybierz zdjęcie</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="Browse">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="Path"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3">
-        <item>
-         <widget class="QPushButton" name="Create_profile_button">
-          <property name="text">
-           <string>Stwórz profil</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="Message_from_database">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
+         <string>Usuń profil</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <item>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>572</width>
+              <height>68</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_11"/>
+           </widget>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Delete_profile_button">
+           <property name="text">
+            <string>Usuń wybrany profil</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="Message_from_database">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
    <item>

@@ -82,7 +82,7 @@ class PoseWorker(QObject):
 
 
 class CameraCalibration(QMainWindow):
-    def __init__(self):
+    def __init__(self, main_window):
         super().__init__()
         ui_path = f"{os.path.dirname(__file__)}/ui/camera_calibration_menu.ui"
         loader = QUiLoader()
