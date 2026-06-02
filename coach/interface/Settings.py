@@ -4,6 +4,7 @@ from sys import path
 from PySide6.QtWidgets import QApplication, QMainWindow, QRadioButton
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from VoiceWorker import VoiceWorker
 
 class Settings(QMainWindow):
     def __init__(self):
@@ -25,6 +26,8 @@ class Settings(QMainWindow):
 
         # Przycisk zatwierdzenia wyboru
         self.ui.Confirm_selection.clicked.connect(self.confirmSelection)
+        self.voice = VoiceWorker()
+        self.voice.play("Wybierz piosenkę d której chcesz ćwiczyć")
 
     def loadSongsAsSelectableList(self):
         # TODO połączenie z bazą i wpisanie tytułu oraz ścieżki do 'rows'
