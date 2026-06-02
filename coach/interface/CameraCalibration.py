@@ -15,14 +15,14 @@ from PySide6.QtMultimedia import (
 from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QLabel
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Slot, Qt, QObject, Signal
-from PySide6.QtGui import QImage, QPixmap, QTransform
+from PySide6.QtGui import QImage, QPixmap
 
-from coach.vision.constants import Issues
 from coach.vision.pose import PoseDetector, PoseLandmarkSmoother, PoseDrawer
+from coach.vision.constants import Issues
+from coach.vision.errors import ErrorDetector
 from coach.vision.analysis.quality import QualityReport
 from coach.vision.analysis.quality import analyze_front, analyze_side
 
-from collections import Counter
 from coach.interface.VoiceWorker import VoiceWorker
 
 
@@ -61,13 +61,12 @@ class PoseWorker(QObject):
             return
 
         landmarks = self.smoother.smooth(result.pose_landmarks[0])
-        if not self.user_calibration.get():
-            if self.direction == "front":
-                result = analyze_front(landmarks)
-            else:
-                result = analyze_side(landmarks)
+        if self.direction == "front":
+            result = analyze_front(landmarks)
+        else:
+            result = analyze_side(landmarks)
 
-            self.quality_result.emit(result)
+        self.quality_result.emit(result)
 
         processed = self.drawer.draw(
             self.last_frame.copy(), landmarks, self.user_calibration.get()
@@ -80,6 +79,7 @@ class PoseWorker(QObject):
     def process_frame(self, frame):
         self.last_frame = frame
         self.detector.detect(frame, int(time.time() * 1000))
+
 
 class CameraCalibration(QMainWindow):
     def __init__(self):
@@ -96,12 +96,8 @@ class CameraCalibration(QMainWindow):
         self.setWindowTitle("Menu kalibracji kamery")
         self.voice = VoiceWorker()
 
-        # TODO Do przetestowania czy chcemy mieć kamerki 16:9 czy 4:3 oraz dopasowanie do tego interfejsu
-        # trzeba to podzielić na 2 równe częsci kamerek pionowych z telefonów, rozdzielczoć kamer to 720x1280, a monitora 1920x1080
         self.ui.Camera_front.setFixedSize(480, 640)
         self.ui.Camera_side.setFixedSize(480, 640)
-        # self.ui.Camera_front.setFixedSize(640, 360)
-        # self.ui.Camera_side.setFixedSize(640, 360)
 
         self.worker_front = PoseWorker("front")
         self.worker_front.image_processed.connect(self.update_display_front)
@@ -111,7 +107,9 @@ class CameraCalibration(QMainWindow):
         self.worker_side.image_processed.connect(self.update_display_side)
         self.worker_side.quality_result.connect(self.handle_report)
 
-        self.issues_per_frame: list[list[str]] = []
+        self.error_detector = ErrorDetector(
+            window_size=60, threshold=20, cooldown_frames=240
+        )
 
         self.label_front = QLabel()
         self.label_side = QLabel()
@@ -120,23 +118,20 @@ class CameraCalibration(QMainWindow):
 
         cameras = QMediaDevices.videoInputs()
         if len(cameras) < 2:
-            # TODO: komunikat głosowy o braku dwóch kamer
-            self.messageToUser(
-                "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
-            )
-            # self.voice.say(
-            #     "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
-            # )
+            msg = "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
+            self.messageToUser(msg)
+            # TODO: nowe komunikaty głosowe dla użytkownika
+            # self.voice.say(msg)
             return
 
-        self.camera1 = QCamera(cameras[1])  # obraz z kamerki
+        self.camera1 = QCamera(cameras[2])  # obraz z kamerki
         self.session1 = QMediaCaptureSession()
         self.sink1 = QVideoSink()
         self.session1.setCamera(self.camera1)
         self.session1.setVideoSink(self.sink1)
         self.sink1.videoFrameChanged.connect(self.handle_camera_frame_front)
 
-        self.camera2 = QCamera(cameras[0])  # obraz z kamerki
+        self.camera2 = QCamera(cameras[1])  # obraz z kamerki
         self.session2 = QMediaCaptureSession()
         self.sink2 = QVideoSink()
         self.session2.setCamera(self.camera2)
@@ -174,26 +169,16 @@ class CameraCalibration(QMainWindow):
         self.worker_side.process_frame(arr)
 
     def handle_report(self, report: QualityReport):
-        self.issues_per_frame.append(Issues.to_polish(report.issues))
+        self.error_detector.update(report.issues)
 
-        combined_counter = Counter()
-        for counter in self.issues_per_frame:
-            combined_counter.update(x for x in counter)
+        alerts = self.error_detector.show_alerts()
+        for issue in alerts:
+            ...
+            # TODO: Komunikaty głosowe dla użytkownika, 3 kropki do usunięcia jak kod zostanie dodany
+            # self.voice.say(Issues.to_polish(issue))
 
-        show_issues = []
-        for issue, count in combined_counter.most_common():
-            if (
-                count > 14
-            ):  # jeśli dany problem pojawił się więcej niż 14 razy, wyświetl go użytkownikowi
-                show_issues.append(issue)
-
-        if len(self.issues_per_frame) > 30:
-            self.issues_per_frame.pop(0)
-
-        # TODO: komunikaty głosowe dla użytkownika o błędach
-        # for issue in show_issues:
-        #     self.voice.say(issue)
-        self.messageToUser("\n".join(show_issues))
+        active = self.error_detector.get_active_errors()
+        self.messageToUser("\n".join(Issues.to_polish_list(active)))
 
     @Slot(QImage)
     def update_display_front(self, q_img):

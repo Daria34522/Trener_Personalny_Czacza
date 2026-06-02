@@ -55,7 +55,22 @@ class Issues(StrEnum):
     ZA_DLUGI_KROK = "ZA_DLUGI_KROK"
 
     @staticmethod
-    def to_polish(issues: list[Issues]) -> list[str]:
+    def to_polish(issue: Issues) -> str:
+        """Zamienia kod błędu na czytelny komunikat po polsku."""
+        translations = {
+            "SLABE_PRZENIESIENIE_CIEZARU": "Przenieś bardziej ciężar bioder na noge z aktualnym ciężarem",
+            "BIODRA_NIEROWNE": "Biodra nie są prosto – wyrównaj",
+            "RECE_ZA_NISKO": "Unieś ręce – są zbyt nisko",
+            "RECE_ZA_WYSOKO": "Opuść ręce – są zbyt wysoko",
+            "KOLANO_UGIETE": "Kolano jest za bardzo ugięte – uważaj na kolana!",
+            "MALO_WIDOCZNY_W_KAMERACH": "Jesteś mało widoczny w kamerach – popraw ustawienie",
+            "ZA_GLEBOKI_KROK": "Krok w przód/tył jest zbyt głęboki, przybliż troche stopy do siebie",
+            "ZA_DLUGI_KROK": "Krok w lewo/prawo jest zbyt szeroki, przybliż troche stopy od siebie",
+        }
+        return translations.get(issue, "Nieznany błąd")
+
+    @staticmethod
+    def to_polish_list(issues: list[Issues]) -> list[str]:
         """Zamienia kody błędów na czytelne komunikaty po polsku."""
         translations = {
             "SLABE_PRZENIESIENIE_CIEZARU": "Przenieś bardziej ciężar bioder na noge z aktualnym ciężarem",
@@ -69,5 +84,5 @@ class Issues(StrEnum):
         }
         result = []
         for issue in issues:
-            result.append(translations.get(issue))
+            result.append(translations.get(issue, "Nieznany błąd"))
         return result
