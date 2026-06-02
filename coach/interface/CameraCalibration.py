@@ -120,8 +120,7 @@ class CameraCalibration(QMainWindow):
         if len(cameras) < 2:
             msg = "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
             self.messageToUser(msg)
-            # TODO: nowe komunikaty głosowe dla użytkownika
-            # self.voice.say(msg)
+            self.voice.play(text= msg)
             return
 
         self.camera1 = QCamera(cameras[2])  # obraz z kamerki
@@ -141,7 +140,7 @@ class CameraCalibration(QMainWindow):
         self.camera1.start()
         self.camera2.start()
         self.voice = VoiceWorker()
-        self.voice.say("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
+        self.voice.play("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
 
     def setup_camera_ui(self, container, label):
         layout = QHBoxLayout(container)
@@ -174,8 +173,7 @@ class CameraCalibration(QMainWindow):
         alerts = self.error_detector.show_alerts()
         for issue in alerts:
             ...
-            # TODO: Komunikaty głosowe dla użytkownika, 3 kropki do usunięcia jak kod zostanie dodany
-            # self.voice.say(Issues.to_polish(issue))
+            self.voice.play(Issues.to_polish(issue))
 
         active = self.error_detector.get_active_errors()
         self.messageToUser("\n".join(Issues.to_polish_list(active)))
