@@ -68,7 +68,6 @@ class MainMenu(QMainWindow):
         ui_file.close()
         self.setWindowTitle("Trener")
         loadImages(self) # ładowanie obrazków
-        self.showMaximized()
 
         # Dane użytkownika
         user_id = -1
@@ -91,6 +90,8 @@ class MainMenu(QMainWindow):
         self.stacked_widget.addWidget(self.tutorial_window)
 
         self.stacked_widget.setCurrentWidget(self.profile_window)
+
+        self.showMaximized()
 
         # Łączenie przycisków z metodami
         self.ui.Start_training.clicked.connect(self.startTraining)

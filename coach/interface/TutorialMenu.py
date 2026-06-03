@@ -33,7 +33,6 @@ class TutorialMenu(QMainWindow):
         self.player.setVideoOutput(self.real_video_widget)
 
         self.setWindowTitle("Film instruktażowy")
-        self.showMaximized()
 
         # łączenie przycisków z metodami
         self.ui.btn_play.clicked.connect(self.toggle_play)

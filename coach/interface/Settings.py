@@ -18,7 +18,6 @@ class Settings(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Ustawienia")
-        self.showMaximized()
 
         self.radio_buttons = [] # Kontener na piosenki
         self.loadSongsAsSelectableList() # ładowanie muzyki do menu

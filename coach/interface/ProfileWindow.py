@@ -88,7 +88,6 @@ class ProfileWindow(QMainWindow):
         ui_file.close()
         self.setWindowTitle("Wybór profilu")
         loadProfileImagesAndNames(self) # Ładowanie nazw użytkowików oraz zdjęć
-        self.showMaximized()
 
         # Łączenie przycisków z metodami
         self.ui.Create_profile_button.clicked.connect(self.createProfile)

@@ -20,7 +20,6 @@ class CalendarMenu(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Plan treningowy")
-        self.showMaximized()
         self.loadTrainingList()
         self.selectedDate()
 

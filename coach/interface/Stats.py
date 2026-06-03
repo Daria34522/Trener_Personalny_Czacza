@@ -22,7 +22,6 @@ class Stats(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Statystyki")
-        self.showMaximized()
 
         # Data domyślna
         self.ui.From_date.setDate(QDate.currentDate())
