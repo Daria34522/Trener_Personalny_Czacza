@@ -98,7 +98,7 @@ class ProfileWindow(QMainWindow):
             widget = self.findChild(QPushButton, f"ProfileImage_{i}")
             widget.clicked.connect(lambda event, w=widget: self.loadProfile(w))
         self.voice = VoiceWorker()
-        self.voice.say("Wybierz swój profil lub utwórz nowy")
+        self.voice.play("Wybierz swój profil lub utwórz nowy")
 
     # obsługa przycisków oraz funkcji okienka
     def createProfile(self):

@@ -6,6 +6,7 @@ from PySide6.QtGui import QIcon, Qt
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QFrame, QHBoxLayout
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, QDate
+from VoiceWorker import VoiceWorker
 
 class CalendarMenu(QMainWindow):
     def __init__(self, main_window):
@@ -30,7 +31,10 @@ class CalendarMenu(QMainWindow):
         self.ui.Calendar1.clicked.connect(self.selectedDate)
         self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
-    def loadTrainingList(self):  # Pokazanie całej listy treningowej
+        self.voice = VoiceWorker()
+        self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
+
+    def loadTrainingList(self): # Pokazanie całej listy treningowej
         # TODO połączenie z bazą danych oraz pobranie wszystkich planów treningowych które odbędą się w przyszłości
         rows = [
             ("Cardio Interwały na bieżni", "2026-05-16", "00:45"),

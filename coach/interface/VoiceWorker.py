@@ -1,4 +1,5 @@
 import sys
+from time import sleep
 
 from PySide6.QtCore import QThread
 import os
@@ -16,14 +17,31 @@ class VoiceWorker(QThread):
         super().__init__()
         self.text = ""
         self.filename = ""
+        self.to_delete= True
+        self.to_create = True
+        self.channel_id =0
+        self. volume =1.0
 
-    def say(self, text, filename="example"):
+    def play(self, text = "", filename="example", to_delete=True, to_create=True, channel_id=0, volume=1.0):
         self.text = text
         self.filename = filename
+        self.to_delete = to_delete
+        self.to_create = to_create
+        self.channel_id = channel_id
+        self.volume = volume
         if not self.isRunning():
             self.start()
+
     def run(self):
-        speaker = Speaker(voice_filename = self.filename)
-        speaker.gen_speak(self.text)
-        speaker.speak()
-        speaker.delete_file()
+        speaker = Speaker(voice_filename = self.filename, channel_id = self.channel_id)
+        if self.to_create is True:
+            speaker.gen_speak(self.text)
+
+        chanel = speaker.speak(channel_id=self.channel_id, volume=self.volume)
+
+        while chanel.get_busy():
+            self.msleep(100)
+
+        if self.to_delete is True:
+            speaker.delete_file()
+
