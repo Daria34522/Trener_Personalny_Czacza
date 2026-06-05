@@ -1,10 +1,20 @@
+import os
 import sys
 from sys import path
+
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+from database.DBHandler import DBHandler
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QRadioButton
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 from VoiceWorker import VoiceWorker
+
+db_path = os.path.join(parent_dir, "database/db.sqlite")
+db = DBHandler(db_path)
 
 class Settings(QMainWindow):
     def __init__(self, main_window):
@@ -29,17 +39,12 @@ class Settings(QMainWindow):
         self.voice.play("Wybierz piosenkę d której chcesz ćwiczyć")
 
     def loadSongsAsSelectableList(self):
-        # TODO połączenie z bazą i wpisanie tytułu oraz ścieżki do 'rows'
-        rows = [
-            ("tytul1", "assets/music/1"),
-            ("2", "assets/music/2"),
-            ("3", "assets/music/3")
-        ] # Przykład
-
+        rows = db.get_all_songs()
         for row in rows:
-            tytul, sciezka = row  # Rozpakowujemy tytuł i ścieżkę
-            radio = QRadioButton(f"🎵 {tytul}")
-            radio.setProperty("song_path", sciezka)
+            tytul, artysta, sciezka = row  # Rozpakowujemy tytuł i ścieżkę
+            radio = QRadioButton(f"🎵 {artysta} - {tytul}")
+            full_path = os.path.join("database/music/", sciezka)
+            radio.setProperty("song_path", full_path)
             self.ui.scrollArea.widget().layout().addWidget(radio)
             self.radio_buttons.append(radio)
 
@@ -56,6 +61,7 @@ class Settings(QMainWindow):
             self.ui.Message.setText("Proszę wybrać utwór") # Wyświetlenie błędu w gui
         else:
             # TODO póki co zapisuje tylko ID piosenki
+            # (Propozycja) Moim zdaniem może być tylko ID, a później po ID będziemy zczytywać gdzie indziej ścieżke i tytuł z bazy - Michał
             self.parent().parent().selectedSong(selected_song_id)
             self.parent().setCurrentIndex(0)
             pass

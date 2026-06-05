@@ -45,7 +45,7 @@ class DBHandler:
     def get_all_songs(self):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT song_id, title, artist, audio_file FROM music")
+            cursor.execute("SELECT title, artist, audio_file FROM music")
             return cursor.fetchall()
 
     #----------------------------------------------------------------------
