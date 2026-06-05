@@ -4,11 +4,12 @@ from sys import path
 from PySide6.QtWidgets import QApplication, QMainWindow, QRadioButton
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from VoiceWorker import VoiceWorker
 
 class Settings(QMainWindow):
-    def __init__(self):
-        # Ładowanie pliku .ui
+    def __init__(self, main_window):
         super().__init__()
+        self.main_window = main_window
         ui_path = "ui/settings.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -18,13 +19,14 @@ class Settings(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Ustawienia")
-        self.showMaximized()
 
         self.radio_buttons = [] # Kontener na piosenki
         self.loadSongsAsSelectableList() # ładowanie muzyki do menu
 
         # Przycisk zatwierdzenia wyboru
         self.ui.Confirm_selection.clicked.connect(self.confirmSelection)
+        self.voice = VoiceWorker()
+        self.voice.play("Wybierz piosenkę d której chcesz ćwiczyć")
 
     def loadSongsAsSelectableList(self):
         # TODO połączenie z bazą i wpisanie tytułu oraz ścieżki do 'rows'
@@ -44,6 +46,7 @@ class Settings(QMainWindow):
     def confirmSelection(self):
         selected_song_path = None
         selected_song_title = ""
+        selected_song_id = -1
         for radio in self.radio_buttons: # szukanie zaznaczonej piosenki
             if radio.isChecked():
                 selected_song_path = radio.property("song_path")
@@ -52,7 +55,9 @@ class Settings(QMainWindow):
         if selected_song_path is None:
             self.ui.Message.setText("Proszę wybrać utwór") # Wyświetlenie błędu w gui
         else:
-            ## TODO zwrócenie tytułu oraz ścieżki do Maina
+            # TODO póki co zapisuje tylko ID piosenki
+            self.parent().parent().selectedSong(selected_song_id)
+            self.parent().setCurrentIndex(0)
             pass
 
 if __name__ == "__main__":

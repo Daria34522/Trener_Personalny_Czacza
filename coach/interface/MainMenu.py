@@ -2,9 +2,17 @@ import os
 import sys
 from sys import path
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+from VoiceWorker import VoiceWorker
+
+from coach.interface.CalendarMenu import CalendarMenu
+from coach.interface.CameraCalibration import CameraCalibration
+from coach.interface.ProfileWindow import ProfileWindow
+from coach.interface.Settings import Settings
+from coach.interface.Stats import Stats
+from coach.interface.TutorialMenu import TutorialMenu
 
 def loadImages(Window):
     menu_button_style = """
@@ -26,7 +34,6 @@ def loadImages(Window):
         }
     """
 
-    # Konfiguracja przycisków
     buttons = {
         Window.ui.Start_training: "assets/icons/dancestart.png",
         Window.ui.Settings: "assets/icons/settings.png",
@@ -47,8 +54,10 @@ def loadImages(Window):
 
 class MainMenu(QMainWindow):
     def __init__(self):
-        # Ładowanie pliku .ui
         super().__init__()
+        self.stacked_widget = QStackedWidget() # Stackowanie okienek
+        self.setCentralWidget(self.stacked_widget)
+
         ui_path = f"{os.path.dirname(__file__)}/ui/main_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
@@ -57,8 +66,31 @@ class MainMenu(QMainWindow):
             sys.exit(-1)
         self.ui = loader.load(ui_file, self)
         ui_file.close()
-        self.setWindowTitle("Menu główne")
+        self.setWindowTitle("Trener")
         loadImages(self) # ładowanie obrazków
+
+        # Dane użytkownika
+        user_id = -1
+        song_id = -1
+
+        # Obiekty okienek
+        self.stacked_widget.addWidget(self.ui)
+        self.settings_window = Settings(self)
+        self.calendar_window = CalendarMenu(self)
+        self.camera_window = CameraCalibration(self)
+        self.profile_window = ProfileWindow(self)
+        self.stats_window = Stats(self)
+        self.tutorial_window = TutorialMenu(self)
+
+        self.stacked_widget.addWidget(self.settings_window)
+        self.stacked_widget.addWidget(self.calendar_window)
+        self.stacked_widget.addWidget(self.camera_window)
+        self.stacked_widget.addWidget(self.profile_window)
+        self.stacked_widget.addWidget(self.stats_window)
+        self.stacked_widget.addWidget(self.tutorial_window)
+
+        self.stacked_widget.setCurrentWidget(self.profile_window)
+
         self.showMaximized()
 
         # Łączenie przycisków z metodami
@@ -68,28 +100,41 @@ class MainMenu(QMainWindow):
         self.ui.Calendar.clicked.connect(self.calendar)
         self.ui.Tutorial.clicked.connect(self.tutorial)
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
+        self.voice = VoiceWorker()
+        self.voice.play("Witaj w asystencie czaczy. Wybierz co chcesz zrobić")
+
 
     # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
     pass
 
     # obsługa przycisków oraz funkcji okienka
     def startTraining(self):
-        pass
+        self.stacked_widget.setCurrentWidget(self.camera_window)
 
     def settings(self):
-        pass
+        self.stacked_widget.setCurrentWidget(self.settings_window)
 
     def stats(self):
-        pass
+        self.stats_window.setProfile(self.user_id)
+        self.stacked_widget.setCurrentWidget(self.stats_window)
 
     def calendar(self):
-        pass
+        self.calendar_window.setProfile(self.user_id)
+        self.stacked_widget.setCurrentWidget(self.calendar_window)
 
     def tutorial(self):
-        pass
+        self.stacked_widget.setCurrentWidget(self.tutorial_window)
 
     def profileSelection(self):
-        pass
+        self.stacked_widget.setCurrentWidget(self.profile_window)
+
+    def loggedUser(self, user):
+        self.user_id = user
+        print(self.user_id)
+
+    def selectedSong(self, song):
+        self.song_id = song
+        print(self.song_id)
 
 
 if __name__ == "__main__":

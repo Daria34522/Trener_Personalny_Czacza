@@ -173,7 +173,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -200,6 +200,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Main_menu">
+        <property name="text">
+         <string>Menu główne</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

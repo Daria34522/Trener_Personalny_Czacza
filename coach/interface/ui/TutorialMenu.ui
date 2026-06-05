@@ -65,9 +65,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="backto_main_menu">
+      <widget class="QPushButton" name="Main_menu">
        <property name="text">
-        <string>Wyjdź do menu głównego</string>
+        <string>Menu główne</string>
        </property>
       </widget>
      </item>
