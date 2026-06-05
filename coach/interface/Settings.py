@@ -61,7 +61,7 @@ class Settings(QMainWindow):
             self.ui.Message.setText("Proszę wybrać utwór") # Wyświetlenie błędu w gui
         else:
             # TODO póki co zapisuje tylko ID piosenki
-            # (Propozycja) Moim zdaniem może być tylko ID, a później po ID będziemy zczytywać gdzie indziej ścieżke i tytuł z bazy - Michał
+            # (Propozycja) Moim zdaniem może być tylko ID, a później po ID będziemy zczytywać tam gdzie to potrzebne ścieżke i tytuł z bazy po id - Michał
             self.parent().parent().selectedSong(selected_song_id)
             self.parent().setCurrentIndex(0)
             pass
