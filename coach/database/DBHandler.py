@@ -15,6 +15,13 @@ class DBHandler:
             cursor.execute("SELECT user_id, username, profile_photo FROM users")
             return cursor.fetchall()
 
+    def get_a_user(self, user_id):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT username FROM users WHERE user_id = ?", (user_id,))
+            result = cursor.fetchone()
+            return result[0]
+
     def add_user(self, username, profile_photo=None):
         with self.connect() as conn:
             cursor = conn.cursor()
