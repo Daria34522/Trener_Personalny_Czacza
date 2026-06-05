@@ -69,7 +69,7 @@ class MainMenu(QMainWindow):
         self.setWindowTitle("Trener")
         loadImages(self) # ładowanie obrazków
 
-        # Dane użytkownika
+        # TODO Dane użytkownika
         user_id = -1
         song_id = -1
 

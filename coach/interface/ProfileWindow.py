@@ -16,7 +16,8 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize
 from VoiceWorker import VoiceWorker
 
-db = DBHandler("database.db.sqlite")
+db_path = os.path.join(parent_dir, "database/db.sqlite")
+db = DBHandler(db_path)
 
 def loadProfileImagesAndNames(Window,):
 
