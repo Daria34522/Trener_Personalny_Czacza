@@ -107,12 +107,13 @@ class CalendarMenu(QMainWindow):
         db.add_training_plan(self.user_id, datestr, Target, Total)
 
         self.ui.Message.setText("Wpis został dodany")
+        self.loadTrainingList()
         pass
 
     def selectedDate(self):  # Wypisanie planu na wybrany dzień
         Date = self.ui.Calendar1.selectedDate()
         # Wybrany dzień
-        datestr = Date.toString("dd-MM-yyyy")
+        datestr = Date.toString("yyyy-MM-dd")
 
         trening = db.get_training_plan_from_date(self.user_id, datestr)
         Target = ""

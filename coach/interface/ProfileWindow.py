@@ -21,12 +21,13 @@ db = DBHandler(db_path)
 
 def loadProfileImagesAndNames(Window,):
 
-    profiles_data = [
-        ("Nazwa Użytkownika 1", "id1", "assets/icons/profile.png"),
-        ("Nazwa Użytkownika 2", "id2", "assets/icons/profile.png"),
-        ("Nazwa Użytkownika 3", "id3", "assets/icons/profile.png"),
-        ("Nazwa Użytkownika 4", "id4", "assets/icons/profile.png"),
-    ] #TODO pobrać z bazy dane w takiej postaci
+    profiles_data = db.get_all_users()
+    # profiles_data = [
+    #     ("Nazwa Użytkownika 1", "id1", "assets/icons/profile.png"),
+    #     ("Nazwa Użytkownika 2", "id2", "assets/icons/profile.png"),
+    #     ("Nazwa Użytkownika 3", "id3", "assets/icons/profile.png"),
+    #     ("Nazwa Użytkownika 4", "id4", "assets/icons/profile.png"),
+    # ] #TODO pobrać z bazy dane w takiej postaci
 
     profile_button_style = """
             QPushButton {
@@ -51,7 +52,7 @@ def loadProfileImagesAndNames(Window,):
         Window.radio_buttons = []
 
     for index, profile in enumerate(profiles_data):
-        user_name, user_id, img_path = profile
+        user_id, user_name, img_path = profile
         tile_number = index + 1
 
         if tile_number <= 6:
@@ -130,11 +131,9 @@ class ProfileWindow(QMainWindow):
             )  # Wyświetlenie błędu w gui
             return
 
-        # TODO Komunikacja z bazą danych oraz stworzenie profilu
         db.add_user(user_name, image_path)
         pass
 
-        # Wczytanie obrazków i nazw do UI
         loadProfileImagesAndNames(self)
 
     def deleteProfile(self):
@@ -147,6 +146,7 @@ class ProfileWindow(QMainWindow):
             self.ui.Message_from_database.setText("Proszę wybrać profil")  # Wyświetlenie błędu w gui
         else:
             # TODO usunięcie profilu z bazy
+            db.delete_user(user_id)
 
             self.ui.Message_from_database.setText("Wybrany profil został usunięty")
             loadProfileImagesAndNames(self)  # Wczytanie obrazków i nazw do UI
