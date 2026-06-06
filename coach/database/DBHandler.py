@@ -20,7 +20,7 @@ class DBHandler:
             cursor = conn.cursor()
             cursor.execute("SELECT username FROM users WHERE user_id = ?", (user_id,))
             result = cursor.fetchone()
-            return result[0]
+            return result[0] if result else None
 
     def add_user(self, username, profile_photo=None):
         with self.connect() as conn:
