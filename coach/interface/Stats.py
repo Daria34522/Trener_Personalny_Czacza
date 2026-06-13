@@ -33,7 +33,7 @@ class Stats(QMainWindow):
         ui_file.close()
         self.setWindowTitle("Statystyki")
 
-        self.user_id = 9
+        self.user_id = -1
 
         # Data domyślna
         self.ui.From_date.setDate(QDate.currentDate())
@@ -53,6 +53,7 @@ class Stats(QMainWindow):
         first_date = self.ui.From_date.text().split(".")
         second_date = self.ui.Until_date.text().split(".")
         # TODO pobranie danych z bazy oraz narysowanie wykresu
+        db.get_a_user(self.user_id)
         info = db.get_statistics_between_dates(self.user_id, first_date, second_date)
         print(info)
         pass

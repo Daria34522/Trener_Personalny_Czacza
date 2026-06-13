@@ -176,13 +176,12 @@ class ProfileWindow(QMainWindow):
         # Pobranie z menu danych użytkownika i sprawdzenie ich poprawności
         number = widget.objectName().replace("ProfileImage_", "")
         profile_name = self.findChild(QLabel, f"ProfileName_{number}").text()
-        print(profile_name)
 
         # TODO Obsługa pustego profilu
         pass
 
         # TODO Komunikacja z bazą danych oraz załadowanie profilu
-        user_id = -1  # Przykładowe id użytkownika
+        user_id = db.get_a_userid(profile_name)
         pass
 
         # Przekazanie id użytkownika i przełączenie do menu głównego

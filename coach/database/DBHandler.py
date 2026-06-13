@@ -22,6 +22,14 @@ class DBHandler:
             result = cursor.fetchone()
             return result[0] if result else None
 
+    def get_a_userid(self, username):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+
+
     def add_user(self, username):
         with self.connect() as conn:
             cursor = conn.cursor()

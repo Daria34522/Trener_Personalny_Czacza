@@ -70,8 +70,8 @@ class MainMenu(QMainWindow):
         loadImages(self) # ładowanie obrazków
 
         # TODO Dane użytkownika
-        user_id = -1
-        song_id = -1
+        self.user_id = -1
+        self.song_id = -1
 
         # Obiekty okienek
         self.stacked_widget.addWidget(self.ui)
