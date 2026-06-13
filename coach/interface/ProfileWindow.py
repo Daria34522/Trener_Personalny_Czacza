@@ -127,6 +127,11 @@ class ProfileWindow(QMainWindow):
 
         # Obsługa błędnych danych
         ## TODO należy sprawdzić czy nazwa nie jest zajęta
+        users = db.get_all_users()
+        for user in users:
+            if user[1] == user_name:
+                self.ui.Message_from_database.setText("Podana nazwa już istnieje. Proszę podać inną nazwę użytkownika.")
+                return
         if user_name == "":
             self.ui.Message_from_database.setText("Proszę podać nazwe użytkownika")  # Wyświetlenie błędu w gui
             return
@@ -144,7 +149,7 @@ class ProfileWindow(QMainWindow):
             img = Image.open("assets/icons/profile.png")
             img.save(f"../database/pfps/{user_name}.png")
 
-        db.add_user(user_name, image_path)
+        db.add_user(user_name)
         loadProfileImagesAndNames(self)
 
     def deleteProfile(self):
@@ -157,8 +162,8 @@ class ProfileWindow(QMainWindow):
             self.ui.Message_from_database.setText("Proszę wybrać profil")  # Wyświetlenie błędu w gui
         else:
             # TODO niestety trzeba pobrać nazwę użytkownika żeby usunąć zdjęcie
-            user_name = 'xyz'
-            #os.remove(f"../database/pfps/{user_name}.png") # Odkomentować jak już będzie pobrana nazwa użytkownika
+            user_name = db.get_a_user(user_id)
+            os.remove(f"../database/pfps/{user_name}.png") # Odkomentować jak już będzie pobrana nazwa użytkownika
             # TODO usunięcie profilu z bazy
             db.delete_user(user_id)
 

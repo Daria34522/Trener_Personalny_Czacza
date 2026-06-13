@@ -12,7 +12,7 @@ class DBHandler:
     def get_all_users(self):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT user_id, username, profile_photo FROM users")
+            cursor.execute("SELECT user_id, username FROM users")
             return cursor.fetchall()
 
     def get_a_user(self, user_id):
@@ -22,10 +22,10 @@ class DBHandler:
             result = cursor.fetchone()
             return result[0] if result else None
 
-    def add_user(self, username, profile_photo=None):
+    def add_user(self, username):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO users (username, profile_photo, created_at) VALUES (?, ?, DATE('now'))", (username, profile_photo))
+            cursor.execute("INSERT INTO users (username, created_at) VALUES (?, DATE('now'))", (username,))
             conn.commit()
             return cursor.lastrowid
 
