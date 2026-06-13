@@ -65,7 +65,7 @@ def loadProfileImagesAndNames(Window):
         """
     ## TODO wywalamy z bazy img_path
     for index, profile in enumerate(profiles_data):
-        user_id, user_name, img_path = profile
+        user_id, user_name = profile
         tile_number = index + 1
 
         if tile_number <= 6:
