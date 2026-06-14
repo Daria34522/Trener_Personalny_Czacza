@@ -51,13 +51,21 @@ class DBHandler:
         with self.connect() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT song_id, title, artist, audio_file FROM music ORDER BY RANDOM() LIMIT 1")
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            return result[0] if result else None
 
     def get_chosen_song(self, music_id):
         with self.connect() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT song_id, title, artist, audio_file FROM music WHERE song_id = ?", (music_id,))
             return cursor.fetchone()
+
+    def get_songid(self, title):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT song_id FROM music WHERE title = ?", (title,))
+            result = cursor.fetchone()
+            return result[0] if result else None
 
     def get_all_songs(self):
         with self.connect() as conn:

@@ -55,13 +55,17 @@ class Settings(QMainWindow):
         for radio in self.radio_buttons: # szukanie zaznaczonej piosenki
             if radio.isChecked():
                 selected_song_path = radio.property("song_path")
-                selected_song_title = radio.text()
+                full_text = radio.text()
+                if " - " in full_text:
+                    selected_song_title = full_text.split(" - ")[-1].strip()
+                else:
+                    selected_song_title = full_text.strip()
                 break
         if selected_song_path is None:
             self.ui.Message.setText("Proszę wybrać utwór") # Wyświetlenie błędu w gui
         else:
-            # TODO póki co zapisuje tylko ID piosenki
-            # (Propozycja) Moim zdaniem może być tylko ID, a później po ID będziemy zczytywać tam gdzie to potrzebne ścieżke i tytuł z bazy po id - Michał
+            selected_song_id = db.get_songid(selected_song_title)
+            print(selected_song_title, selected_song_id)
             self.parent().parent().selectedSong(selected_song_id)
             self.parent().setCurrentIndex(0)
             pass
