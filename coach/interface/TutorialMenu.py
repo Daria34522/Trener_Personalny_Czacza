@@ -67,6 +67,7 @@ class TutorialMenu(QMainWindow):
         self.audio_output.setVolume(float_volume)
 
     def backToMainMenu(self):
+        self.player.pause()
         self.parent().setCurrentIndex(0)
 
 if __name__ == "__main__":

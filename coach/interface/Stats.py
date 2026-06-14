@@ -9,14 +9,14 @@ if parent_dir not in sys.path:
 
 from database.DBHandler import DBHandler
 
-from PySide6.QtMultimedia import QCamera, QMediaCaptureSession
-from PySide6.QtMultimediaWidgets import QVideoWidget
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter
 from PySide6.QtCharts import QChart, QChartView, QBarSet, QBarSeries, QBarCategoryAxis, QValueAxis
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QDate
+from PySide6.QtWidgets import QFormLayout, QLabel, QVBoxLayout, QWidget
 from VoiceWorker import VoiceWorker
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
@@ -123,8 +123,63 @@ class Stats(QMainWindow):
         date = self.ui.Selected_date.selectedDate().toString("yyyy-MM-dd")
         # TODO pobranie danych z bazy oraz wyświetlenie danych
         info = db.get_statistics_from_date(self.user_id, date)
-        print(info)
-        pass
+        old_layout = self.ui.Day_stats.layout()
+        if old_layout is not None:
+            while old_layout.count():
+                item = old_layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+            QWidget().setLayout(old_layout)
+
+        if not info:
+            layout = QVBoxLayout()
+            no_data_lbl = QLabel("Brak statystyk dla wybranego dnia.")
+            no_data_lbl.setStyleSheet("font-style: italic; color: #7f8c8d;")
+            layout.addWidget(no_data_lbl)
+            self.ui.Day_stats.setLayout(layout)
+            return
+
+        (
+            repetitions,
+            duration_seconds,
+            comment,
+            tempo,
+            step_accuracy,
+            posture,
+        ) = info[0]
+
+        minutes = duration_seconds // 60
+        seconds = duration_seconds % 60
+        time_str = f"{minutes}m {seconds:02d}s"
+
+        layout = QFormLayout()
+        layout.setSpacing(10)
+
+        label_style = "font-weight: bold; color: #2c3e50; font-size: 15px;"
+        value_style = "color: #34495e; font-size: 15px;"
+
+        def add_stat_row(label_text, value_text):
+            lbl = QLabel(label_text)
+            lbl.setStyleSheet(label_style)
+            val = QLabel(str(value_text))
+            val.setStyleSheet(value_style)
+            val.setWordWrap(True)
+            layout.addRow(lbl, val)
+
+        add_stat_row("Liczba powtórzeń:", repetitions)
+        add_stat_row("Czas trwania:", time_str)
+        add_stat_row("Tempo:", tempo)
+        add_stat_row("Precyzja kroków:", step_accuracy)
+        add_stat_row("Postawa:", posture)
+
+        comment_lbl = QLabel(f"*{comment}*")
+        comment_lbl.setStyleSheet(
+            "color: #0096FF; font-weight: bold; font-size: 17px; margin-top: 12px;"
+        )
+        comment_lbl.setWordWrap(True)
+        layout.addRow(comment_lbl)
+        self.ui.Day_stats.setLayout(layout)
 
     def userNameAndGeneralStatistic(self):
         username = db.get_a_user(self.user_id)
@@ -135,6 +190,7 @@ class Stats(QMainWindow):
     def setProfile(self, user):
         self.user_id = user
         self.userNameAndGeneralStatistic()
+        self.displayDayStats()
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
