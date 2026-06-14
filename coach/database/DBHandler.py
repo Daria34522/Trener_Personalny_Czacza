@@ -109,7 +109,7 @@ class DBHandler:
     def get_statistics_from_date(self, user_id, date):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""SELECT * FROM statistics WHERE user_id = ? AND "date" = ?""", (user_id, date))
+            cursor.execute("""SELECT repetitions, duration_seconds, comment, tempo, step_accuracy, posture FROM statistics WHERE user_id = ? AND "date" = ?""", (user_id, date))
             return cursor.fetchall()
 
     def get_exercise_duration(self, user_id):

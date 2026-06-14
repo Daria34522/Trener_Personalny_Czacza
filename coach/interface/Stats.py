@@ -9,16 +9,14 @@ if parent_dir not in sys.path:
 
 from database.DBHandler import DBHandler
 
-from datetime import datetime
 from PySide6.QtMultimedia import QCamera, QMediaCaptureSession
 from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainter
+from PySide6.QtCharts import QChart, QChartView, QBarSet, QBarSeries, QBarCategoryAxis, QValueAxis
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QDate
-from PySide6.QtCore import QDateTime, Qt
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtGui import QPainter
-from PySide6.QtCharts import QChart, QChartView, QLineSeries, QDateTimeAxis, QValueAxis
 from VoiceWorker import VoiceWorker
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
@@ -61,57 +59,63 @@ class Stats(QMainWindow):
         db.get_a_user(self.user_id)
         info = db.get_statistics_between_dates(self.user_id, first_date, second_date)
 
-        # RYSOWANIE WYKRESU
-        seria = QLineSeries()
-        seria.setName("Czas treningu (minuty)")
+        bar_set = QBarSet("Czas treningu")
+
+        kategorie_dat = []
         max_minuty = 0
+
         for row in info:
             data_str, sekundy = row
             minuty = int(float(sekundy) / 60)
-            dt = datetime.strptime(data_str, "%Y-%m-%d")
-            q_dt = QDateTime(dt.year, dt.month, dt.day, 0, 0)
-            seria.append(q_dt.toMSecsSinceEpoch(), minuty)
+            bar_set.append(minuty)
+
+            try:
+                from datetime import datetime
+                dt = datetime.strptime(data_str, "%Y-%m-%d")
+                ladna_data = dt.strftime("%d.%m.%Y")
+            except:
+                ladna_data = data_str
+
+            kategorie_dat.append(ladna_data)
+
             if minuty > max_minuty:
                 max_minuty = minuty
+
+        seria = QBarSeries()
+        seria.append(bar_set)
+
         wykres = QChart()
         wykres.addSeries(seria)
         wykres.setTitle("Ilość przećwiczonych minut w danym dniu")
+        wykres.setAnimationOptions(QChart.SeriesAnimations)
 
-        # 5. Konfiguracja osi X (Oś czasu)
-        axis_x = QDateTimeAxis()
-        axis_x.setFormat("dd.MM.yyyy")  # Format wyświetlania daty na wykresie
+        axis_x = QBarCategoryAxis()
+        axis_x.append(kategorie_dat)
         axis_x.setTitleText("Data")
-        axis_x.setTickCount(max(2, min(len(info), 5)))  # Dynamiczna liczba znaczników (od 2 do 5), żeby uniknąć tłoku
         wykres.addAxis(axis_x, Qt.AlignBottom)
         seria.attachAxis(axis_x)
 
-        # 6. Konfiguracja osi Y (Oś wartości - minuty)
         axis_y = QValueAxis()
         axis_y.setTitleText("Minuty")
-        axis_y.setLabelFormat("%i")  # Wyświetlanie jako liczby całkowite
-        # Ustawiamy zakres od 0 do max_minuty + 10 minut marginesu na górze
-        axis_y.setRange(0, max_minuty + 10)
+        axis_y.setLabelFormat("%i")
+        axis_y.setRange(0, max_minuty + 10)  # Margines na górze
         wykres.addAxis(axis_y, Qt.AlignLeft)
         seria.attachAxis(axis_y)
 
-        # 7. Przygotowanie layoutu wewnątrz Graph_frame
         if not self.ui.Graph_frame.layout():
             layout = QVBoxLayout(self.ui.Graph_frame)
-            layout.setContentsMargins(0, 0, 0, 0)  # Wykres idealnie wypełni ramkę
+            layout.setContentsMargins(0, 0, 0, 0)
         else:
             layout = self.ui.Graph_frame.layout()
 
-        # 8. Czyszczenie poprzedniego wykresu z layoutu ramki
         while layout.count():
             item = layout.takeAt(0)
             widget = item.widget()
             if widget:
                 widget.deleteLater()
 
-        # 9. Tworzenie nowego widoku wykresu i dodanie go do UI
         widok_wykresu = QChartView(wykres)
-        widok_wykresu.setRenderHint(QPainter.Antialiasing)  # Wygładzanie linii wykresu
-
+        widok_wykresu.setRenderHint(QPainter.Antialiasing)
         layout.addWidget(widok_wykresu)
         pass
 
