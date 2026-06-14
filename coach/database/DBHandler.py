@@ -103,7 +103,7 @@ class DBHandler:
     def get_statistics_between_dates(self, user_id, date_from, date_to):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("""SELECT * FROM statistics WHERE user_id = ? AND "date" BETWEEN ? AND ? ORDER BY s.date ASC""", (user_id, date_from, date_to))
+            cursor.execute("""SELECT "date", duration_seconds FROM statistics WHERE user_id = ? AND "date" BETWEEN ? AND ? ORDER BY "date" ASC""", (user_id, date_from, date_to))
             return cursor.fetchall()
 
     def get_statistics_from_date(self, user_id, date):
