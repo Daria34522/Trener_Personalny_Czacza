@@ -40,6 +40,8 @@ class DBHandler:
     def delete_user(self, user_id):
         with self.connect() as conn:
             cursor = conn.cursor()
+            cursor.execute("DELETE FROM training_plan WHERE user_id = ?", (user_id,))
+            cursor.execute("DELETE FROM statistics WHERE user_id = ?", (user_id,))
             cursor.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
             conn.commit()
 

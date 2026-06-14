@@ -34,8 +34,6 @@ class CalendarMenu(QMainWindow):
         self.user_id = -1  # ID użytkownika
 
         self.setWindowTitle("Plan treningowy")
-        self.loadTrainingList()
-        self.selectedDate()
 
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
@@ -132,6 +130,9 @@ class CalendarMenu(QMainWindow):
 
     def setProfile(self, user):
         self.user_id = user
+        self.loadTrainingList()
+        self.selectedDate()
+        self.ui.User_name.setText(db.get_a_user(self.user_id))
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)

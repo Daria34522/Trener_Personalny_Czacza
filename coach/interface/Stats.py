@@ -39,8 +39,6 @@ class Stats(QMainWindow):
         self.ui.From_date.setDate(QDate.currentDate())
         self.ui.Until_date.setDate(QDate.currentDate())
 
-        self.userNameAndGeneralStatistic()
-
         # Łączenie przycisków z metodami
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
@@ -73,6 +71,7 @@ class Stats(QMainWindow):
 
     def setProfile(self, user):
         self.user_id = user
+        self.userNameAndGeneralStatistic()
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
