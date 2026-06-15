@@ -29,8 +29,11 @@ from database.DBHandler import DBHandler
 
 user_calibration = AtomicBool(True)
 
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 class PoseWorker(QObject):
     image_processed = Signal(QImage)
@@ -166,7 +169,13 @@ class CameraCalibration(QMainWindow):
         file_name = db.get_chosen_song(file_id)
         if started:
             self.voice.play("Trening rozpoczęty. Powodzenia!")
-            self.song.play(filename=file_name, to_delete=False, to_create=False, channel_id=1, volume=0.5)
+            self.song.play(
+                filename=file_name,
+                to_delete=False,
+                to_create=False,
+                channel_id=1,
+                volume=0.5,
+            )
         else:
             self.song.stop_playing()
             self.voice.play("Trening zakończony. Świetna robota!")
@@ -196,7 +205,6 @@ class CameraCalibration(QMainWindow):
 
         alerts = self.error_detector.show_alerts()
         for issue in alerts:
-            ...
             self.voice.play(Issues.to_polish(issue))
 
         active = self.error_detector.get_active_errors()
@@ -222,6 +230,7 @@ class CameraCalibration(QMainWindow):
         self.ui.Message_from_app.setText(message)
 
     def backToMainMenu(self):
+        self.song.stop_playing()
         user_calibration.flip()
         self.camera1.stop()
         self.camera2.stop()
