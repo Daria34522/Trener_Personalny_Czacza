@@ -1,5 +1,12 @@
+import os
 import sys
 from sys import path
+
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+from database.DBHandler import DBHandler
 
 from PIL import Image
 from PySide6.QtGui import QIcon, Qt
@@ -7,6 +14,9 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, Q
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, QDate
 from VoiceWorker import VoiceWorker
+
+db_path = os.path.join(parent_dir, "database/db.sqlite")
+db = DBHandler(db_path)
 
 class CalendarMenu(QMainWindow):
     def __init__(self, main_window):
@@ -20,11 +30,10 @@ class CalendarMenu(QMainWindow):
             sys.exit(-1)
         self.ui = loader.load(ui_file, self)
         ui_file.close()
-        self.setWindowTitle("Plan treningowy")
-        self.loadTrainingList()
-        self.selectedDate()
 
-        user_id = -1 # ID użytkownika
+        self.user_id = -1  # ID użytkownika
+
+        self.setWindowTitle("Plan treningowy")
 
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
@@ -35,14 +44,7 @@ class CalendarMenu(QMainWindow):
         self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
 
     def loadTrainingList(self): # Pokazanie całej listy treningowej
-        # TODO połączenie z bazą danych oraz pobranie wszystkich planów treningowych które odbędą się w przyszłości
-        rows = [
-            ("Cardio Interwały na bieżni", "2026-05-16", "00:45"),
-            ("Trening siłowy - Klatka + Triceps", "2026-05-17", "01:00"),
-            ("Rozciąganie i Joga regeneracyjna", "2026-05-20", "00:30"),
-            ("Trening obwodowy FBW (Full Body)", "2026-05-22", "00:55"),
-            ("Spacer regeneracyjny w terenie", "2026-05-24", "01:15")
-        ]  # Przykładowe dane
+        rows = db.get_training_plans(self.user_id)
 
         layout = self.ui.scrollAreaWidgetContents.layout()
         while layout.count():
@@ -50,7 +52,7 @@ class CalendarMenu(QMainWindow):
             if child.widget():
                 child.widget().deleteLater()
         for row in rows:
-            opis, data, czas = row
+            data, opis, czas = row
 
             row_widget = QFrame()
             row_widget.setStyleSheet("""
@@ -69,7 +71,10 @@ class CalendarMenu(QMainWindow):
             label_data = QLabel(str(data))
             label_data.setStyleSheet("font-size: 13px; color: #888888; border: none; background: transparent;")
             label_data.setAlignment(Qt.AlignCenter)
-            label_czas = QLabel(f"⏱️ {czas}")
+            Hours = czas // 3600
+            Minutes = (czas % 3600) // 60
+            Time = f"{Hours:02d}:{Minutes:02d}"
+            label_czas = QLabel(Time)
             label_czas.setStyleSheet(
                 "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;")
             label_czas.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
@@ -90,37 +95,44 @@ class CalendarMenu(QMainWindow):
         minutes = Time.minute()
         seconds = Time.second()
         # Wybrany dzień
-        parsed_date = Date.toString("dd-MM-yyyy").split("-")
-        print(parsed_date)
+        datestr = Date.toString("yyyy-MM-dd")
 
         if Target == "" or Date < QDate.currentDate():
             self.ui.Message.setText("Cel jest pusty lub data jest z przeszłości")
             return
 
+        Total = 3600 * hours + 60 * minutes + seconds
+        db.add_training_plan(self.user_id, datestr, Target, Total)
+
         self.ui.Message.setText("Wpis został dodany")
-        # TODO komunikacja z bazą i dodanie wpisu
+        self.loadTrainingList()
         pass
 
     def selectedDate(self):  # Wypisanie planu na wybrany dzień
         Date = self.ui.Calendar1.selectedDate()
         # Wybrany dzień
-        parsed_date = Date.toString("dd-MM-yyyy").split("-")
-        print(parsed_date)
+        datestr = Date.toString("yyyy-MM-dd")
 
-        # TODO połączenie z bazą i pobranie planu na konkretny dzień
-        pass
-
-        Target = "Szybkie bieganie"  # Przykładowe dane
-        Czas = "20min"
+        trening = db.get_training_plan_from_date(self.user_id, datestr)
+        Target = ""
+        for t in trening:
+            Target, Seconds = t
 
         if Target == "":
             self.ui.Target_2.setText("Brak treningu na dany dzień")
+            self.ui.Time_2.setText("")
         else:
             self.ui.Target_2.setText(Target)
-            self.ui.Time_2.setText(Czas)
+            Hours = Seconds // 3600
+            Minutes = (Seconds % 3600) // 60
+            Time = f"{Hours:02d}:{Minutes:02d}"
+            self.ui.Time_2.setText(Time)
 
     def setProfile(self, user):
         self.user_id = user
+        self.loadTrainingList()
+        self.selectedDate()
+        self.ui.User_name.setText(db.get_a_user(self.user_id))
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
