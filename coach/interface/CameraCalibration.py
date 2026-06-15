@@ -308,8 +308,9 @@ class CameraCalibration(QMainWindow):
         user_calibration.flip()
         self.camera1.stop()
         self.camera2.stop()
-
+        self.voice.stop_playing()
         self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
 
 
 if __name__ == "__main__":

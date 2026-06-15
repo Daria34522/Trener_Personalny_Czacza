@@ -110,6 +110,7 @@ class ProfileWindow(QMainWindow):
         self.ui.Create_profile_button.clicked.connect(self.createProfile)
         self.ui.Browse.clicked.connect(self.choosePhoto)
         self.ui.Delete_profile_button.clicked.connect(self.deleteProfile)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
 
         for i in range(1, 7):
             widget = self.findChild(QPushButton, f"ProfileImage_{i}")
@@ -192,6 +193,10 @@ class ProfileWindow(QMainWindow):
             self, "Wybierz zdjęcie", "", "Images (*.png *.jpg *.jpeg)"
         )
         self.ui.Path.setText(file_name)
+
+    def backToMainMenu(self):
+        self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

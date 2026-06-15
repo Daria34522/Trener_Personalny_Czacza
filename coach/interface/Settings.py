@@ -35,7 +35,7 @@ class Settings(QMainWindow):
 
         # Przycisk zatwierdzenia wyboru
         self.ui.Confirm_selection.clicked.connect(self.confirmSelection)
-
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
 
     def loadSongsAsSelectableList(self):
         rows = db.get_all_songs()
@@ -68,6 +68,10 @@ class Settings(QMainWindow):
             self.parent().parent().selectedSong(selected_song_id)
             self.parent().setCurrentIndex(0)
             pass
+
+    def backToMainMenu(self):
+        self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
