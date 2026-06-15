@@ -1,0 +1,10 @@
+mediapipe
+pyaudio
+PIL
+PySide6
+numpy
+cv2
+opencv-python
+gTTS
+pygame
+SpeechRecognition
