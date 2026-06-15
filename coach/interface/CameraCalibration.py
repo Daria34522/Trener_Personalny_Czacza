@@ -115,12 +115,15 @@ class CameraCalibration(QMainWindow):
         self.label_side = QLabel()
         self.setup_camera_ui(self.ui.Camera_front, self.label_front)
         self.setup_camera_ui(self.ui.Camera_side, self.label_side)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
+        self.voice = VoiceWorker()
 
+    def refresh_cameras(self):
         cameras = QMediaDevices.videoInputs()
         if len(cameras) < 2:
             msg = "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
             self.messageToUser(msg)
-            self.voice.play(text= msg)
+            self.voice.play(text=msg)
             return
 
         self.camera1 = QCamera(cameras[2])  # obraz z kamerki
@@ -139,7 +142,6 @@ class CameraCalibration(QMainWindow):
 
         self.camera1.start()
         self.camera2.start()
-        self.voice = VoiceWorker()
         self.voice.play("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
 
     def setup_camera_ui(self, container, label):
@@ -197,6 +199,8 @@ class CameraCalibration(QMainWindow):
     ):  # metoda pozwala wyświetlić komunikat dla użytkownika w polu 'Informacje' np. o niepoprawnym ustawieniu kamery
         self.ui.Message_from_app.setText(message)
 
+    def backToMainMenu(self):
+        self.parent().setCurrentIndex(0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

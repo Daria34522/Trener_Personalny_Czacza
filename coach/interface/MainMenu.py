@@ -99,7 +99,7 @@ class MainMenu(QMainWindow):
         self.stacked_widget.addWidget(self.stats_window)
         self.stacked_widget.addWidget(self.tutorial_window)
 
-        self.stacked_widget.setCurrentWidget(self.profile_window)
+        self.stacked_widget.setCurrentWidget(self.ui)
 
         self.showMaximized()
 
@@ -114,23 +114,24 @@ class MainMenu(QMainWindow):
         self.voice.play("Witaj w asystencie czaczy. Wybierz co chcesz zrobić")
 
 
-    # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
-    pass
-
     # obsługa przycisków oraz funkcji okienka
     def startTraining(self):
+        self.camera_window.refresh_cameras()
         self.stacked_widget.setCurrentWidget(self.camera_window)
 
     def settings(self):
         self.stacked_widget.setCurrentWidget(self.settings_window)
+        self.voice.play("Wybierz piosenkę d której chcesz ćwiczyć")
 
     def stats(self):
         self.stats_window.setProfile(self.user_id)
         self.stacked_widget.setCurrentWidget(self.stats_window)
+        self.voice.play("Oto twoje statystyki")
 
     def calendar(self):
         self.calendar_window.setProfile(self.user_id)
         self.stacked_widget.setCurrentWidget(self.calendar_window)
+        self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
 
     def tutorial(self):
         self.stacked_widget.setCurrentWidget(self.tutorial_window)

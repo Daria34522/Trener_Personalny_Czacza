@@ -35,8 +35,7 @@ class Settings(QMainWindow):
 
         # Przycisk zatwierdzenia wyboru
         self.ui.Confirm_selection.clicked.connect(self.confirmSelection)
-        self.voice = VoiceWorker()
-        self.voice.play("Wybierz piosenkę d której chcesz ćwiczyć")
+
 
     def loadSongsAsSelectableList(self):
         rows = db.get_all_songs()

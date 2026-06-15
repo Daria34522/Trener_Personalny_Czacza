@@ -103,6 +103,13 @@
      </layout>
     </widget>
    </item>
+   <item>
+          <widget class="QPushButton" name="Main_menu">
+           <property name="text">
+            <string>Menu główne</string>
+           </property>
+          </widget>
+         </item>
   </layout>
  </widget>
  <resources/>

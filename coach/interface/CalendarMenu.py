@@ -40,9 +40,6 @@ class CalendarMenu(QMainWindow):
         self.ui.Calendar1.clicked.connect(self.selectedDate)
         self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
-        self.voice = VoiceWorker()
-        self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
-
     def loadTrainingList(self): # Pokazanie całej listy treningowej
         rows = db.get_training_plans(self.user_id)
 

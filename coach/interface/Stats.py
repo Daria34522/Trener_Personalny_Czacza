@@ -46,8 +46,7 @@ class Stats(QMainWindow):
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
         self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
-        self.voice = VoiceWorker()
-        self.voice.play("Oto twoje statystyki")
+
 
     # Daty pobrane z ui zapisane są w tablicy posiadającej 3 elementy typu String tj. dzień, miesiąc, rok
     def drawGraph(self):
