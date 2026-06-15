@@ -16,42 +16,34 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QLabel
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, Slot, Qt, QObject, Signal
 from PySide6.QtGui import QImage, QPixmap
+from atomicx import AtomicBool
 
 from coach.vision.pose import PoseDetector, PoseLandmarkSmoother, PoseDrawer
-from coach.vision.constants import Issues
+from coach.vision.constants import Issues, PoseLandmark
 from coach.vision.errors import ErrorDetector
 from coach.vision.analysis.quality import QualityReport
 from coach.vision.analysis.quality import analyze_front, analyze_side
 
 from coach.interface.VoiceWorker import VoiceWorker
 
-
-class AtomicBoolean:
-    def __init__(self, initial: bool = False):
-        self._lock = threading.Lock()
-        self.value = initial
-
-    def toggle(self):
-        with self._lock:
-            self.value = not self.value
-
-    def get(self) -> bool:
-        with self._lock:
-            return self.value
+user_calibration = AtomicBool(True)
 
 
 class PoseWorker(QObject):
     image_processed = Signal(QImage)
     quality_result = Signal(QualityReport)
+    trening_started = Signal(bool)
 
     def __init__(self, direction: str = "front"):
         super().__init__()
         self.detector = PoseDetector(result_callback=self.on_pose_result)
         self.smoother = PoseLandmarkSmoother(alpha=0.3)
         self.drawer = PoseDrawer()
-        self.user_calibration = AtomicBoolean(True)
         self.direction = direction
         self.last_frame = None
+
+        self.last_raised_hand_time = 0.0
+        self.cooldown_seconds = 2
 
     def on_pose_result(self, result, output_image, timestamp_ms):
         if self.last_frame is None:
@@ -62,14 +54,28 @@ class PoseWorker(QObject):
 
         landmarks = self.smoother.smooth(result.pose_landmarks[0])
         if self.direction == "front":
-            result = analyze_front(landmarks)
-        else:
-            result = analyze_side(landmarks)
+            l_wrist = landmarks[PoseLandmark.LEFT_WRIST]
+            l_shoulder = landmarks[PoseLandmark.LEFT_SHOULDER]
 
-        self.quality_result.emit(result)
+            up_horizontally_threshold = 0.20
+            if l_wrist.y + up_horizontally_threshold < l_shoulder.y:
+                current_time = time.time()
+
+                if current_time - self.last_raised_hand_time > self.cooldown_seconds:
+                    user_calibration.flip()
+                    self.trening_started.emit(not user_calibration.load())
+                    self.last_raised_hand_time = current_time
+
+        if not user_calibration.load():
+            if self.direction == "front":
+                result = analyze_front(landmarks)
+            else:
+                result = analyze_side(landmarks)
+
+            self.quality_result.emit(result)
 
         processed = self.drawer.draw(
-            self.last_frame.copy(), landmarks, self.user_calibration.get()
+            self.last_frame.copy(), landmarks, user_calibration.load()
         )
         h, w, ch = processed.shape
         q_img = QImage(processed.data, w, h, ch * w, QImage.Format.Format_RGB888)
@@ -102,6 +108,7 @@ class CameraCalibration(QMainWindow):
         self.worker_front = PoseWorker("front")
         self.worker_front.image_processed.connect(self.update_display_front)
         self.worker_front.quality_result.connect(self.handle_report)
+        self.worker_front.trening_started.connect(self.handle_trening_started)
 
         self.worker_side = PoseWorker("side")
         self.worker_side.image_processed.connect(self.update_display_side)
@@ -148,6 +155,13 @@ class CameraCalibration(QMainWindow):
         layout = QHBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(label)
+
+    def handle_trening_started(self, started: bool):
+        # TODO: dodanie muzyki podczas treningu.
+        if started:
+            self.voice.play("Trening rozpoczęty. Powodzenia!")
+        else:
+            self.voice.play("Trening zakończony. Świetna robota!")
 
     def handle_camera_frame_front(self, frame):
         if not frame.isValid():
@@ -200,7 +214,11 @@ class CameraCalibration(QMainWindow):
         self.ui.Message_from_app.setText(message)
 
     def backToMainMenu(self):
+        user_calibration.flip()
+        self.camera1.stop()
+        self.camera2.stop()
         self.parent().setCurrentIndex(0)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
