@@ -57,8 +57,9 @@ class DBHandler:
     def get_chosen_song(self, music_id):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT song_id, title, artist, audio_file FROM music WHERE song_id = ?", (music_id,))
-            return cursor.fetchone()
+            cursor.execute("SELECT audio_file FROM music WHERE song_id = ?", (music_id,))
+            res = cursor.fetchone()
+            return res[0] if res else None
 
     def get_songid(self, title):
         with self.connect() as conn:
