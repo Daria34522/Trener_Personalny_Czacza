@@ -24,6 +24,7 @@ from coach.vision.constants import Issues, PoseLandmark
 from coach.vision.errors import ErrorDetector
 from coach.vision.analysis.quality import QualityReport
 from coach.vision.analysis.quality import analyze_front, analyze_side
+from coach.vision import feedback
 
 from coach.interface.VoiceWorker import VoiceWorker
 from database.DBHandler import DBHandler
@@ -187,7 +188,15 @@ class CameraCalibration(QMainWindow):
 
         self.camera1.start()
         self.camera2.start()
-        self.voice.play("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
+
+        if self.main_window.user_id == -1:
+            self.voice.play(
+                "Nie jesteś zalogowany, twoje statystyki nie będą zapisywane."
+            )
+
+        self.voice.play(
+            "Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę, aby rozpocząć trening."
+        )
 
     def setup_camera_ui(self, container, label):
         layout = QHBoxLayout(container)
@@ -217,10 +226,14 @@ class CameraCalibration(QMainWindow):
         if self.main_window.user_id == -1:
             return
 
-        self.overall_msg = ""
-        self.tempo_msg = ""
-        self.posture_msg = ""
-        self.steps_msg = ""
+        self.overall_msg = feedback.session_summary(
+            self.error_counter["posture"],
+            self.error_counter["steps"],
+            self.error_counter["tempo"],
+        )
+        self.tempo_msg = feedback.tempo_feedback(self.error_counter["tempo"])
+        self.posture_msg = feedback.posture_feedback(self.error_counter["posture"])
+        self.steps_msg = feedback.steps_feedback(self.error_counter["steps"])
 
         db.add_statistics(
             self.main_window.user_id,
@@ -306,8 +319,12 @@ class CameraCalibration(QMainWindow):
     def backToMainMenu(self):
         self.song.stop_playing()
         user_calibration.flip()
-        self.camera1.stop()
-        self.camera2.stop()
+
+        if getattr(self, "camera1", None):
+            self.camera1.stop()
+
+        if getattr(self, "camera2", None):
+            self.camera2.stop()
 
         self.parent().setCurrentIndex(0)
 
