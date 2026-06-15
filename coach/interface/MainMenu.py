@@ -1,6 +1,7 @@
 import os
 import sys
 from sys import path
+from time import sleep
 
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
@@ -118,26 +119,36 @@ class MainMenu(QMainWindow):
     def startTraining(self):
         self.camera_window.refresh_cameras()
         self.stacked_widget.setCurrentWidget(self.camera_window)
+        self.voice.stop_playing()
 
     def settings(self):
         self.stacked_widget.setCurrentWidget(self.settings_window)
-        self.voice.play("Wybierz piosenkę d której chcesz ćwiczyć")
+        self.voice.stop_playing()
+        sleep(0.5)
+        self.voice.play("Wybierz piosenkę do której chcesz ćwiczyć")
 
     def stats(self):
         self.stats_window.setProfile(self.user_id)
         self.stacked_widget.setCurrentWidget(self.stats_window)
+        self.voice.stop_playing()
+        sleep(0.5)
         self.voice.play("Oto twoje statystyki")
 
     def calendar(self):
         self.calendar_window.setProfile(self.user_id)
         self.stacked_widget.setCurrentWidget(self.calendar_window)
+        self.voice.stop_playing()
+        sleep(0.5)
         self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
 
     def tutorial(self):
         self.stacked_widget.setCurrentWidget(self.tutorial_window)
+        self.voice.stop_playing()
 
     def profileSelection(self):
         self.stacked_widget.setCurrentWidget(self.profile_window)
+        self.voice.stop_playing()
+        sleep(0.5)
         self.voice.play("Wybierz swój profil lub utwórz nowy")
 
     def loggedUser(self, user):

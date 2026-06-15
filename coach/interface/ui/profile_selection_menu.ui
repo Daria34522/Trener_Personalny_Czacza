@@ -28,6 +28,7 @@
         <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
+
            <item>
             <widget class="QLabel" name="User_name_label">
              <property name="text">
@@ -72,6 +73,13 @@
            </item>
           </layout>
          </item>
+         <item>
+       <widget class="QPushButton" name="Main_menu">
+        <property name="text">
+         <string>Menu główne</string>
+        </property>
+       </widget>
+      </item>
         </layout>
        </widget>
       </item>

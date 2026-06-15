@@ -319,14 +319,14 @@ class CameraCalibration(QMainWindow):
     def backToMainMenu(self):
         self.song.stop_playing()
         user_calibration.flip()
-
-        if getattr(self, "camera1", None):
+        if hasattr(self, "camera1"):
             self.camera1.stop()
 
-        if getattr(self, "camera2", None):
+        if hasattr(self, "camera2"):
             self.camera2.stop()
 
         self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
 
 
 if __name__ == "__main__":

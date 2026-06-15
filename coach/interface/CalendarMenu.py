@@ -152,6 +152,7 @@ class CalendarMenu(QMainWindow):
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
