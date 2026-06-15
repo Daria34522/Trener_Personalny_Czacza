@@ -49,9 +49,11 @@ class Speaker:
         now_dir = os.path.dirname(os.path.abspath(__file__))
         if channel_id == 0:
             self.folder = os.path.join(now_dir, "voice_records")
+            self.voice_filename = os.path.join(self.folder, self.voice_filename + ".mp3")
         else:
             self.folder = os.path.join(now_dir, "../database/music")
-        self.voice_filename = os.path.join(self.folder, self.voice_filename + ".mp3")
+            self.voice_filename = os.path.join(self.folder, self.voice_filename)
+
 
 
     # Tworzenie pliku audio
@@ -72,9 +74,6 @@ class Speaker:
             channel.set_volume(volume)
 
             channel.play(sound)
-            # czekanie aż skończy
-            while channel.get_busy():
-                time.sleep(0.1)
 
             return channel
         finally:

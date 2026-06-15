@@ -25,9 +25,12 @@ from coach.vision.analysis.quality import QualityReport
 from coach.vision.analysis.quality import analyze_front, analyze_side
 
 from coach.interface.VoiceWorker import VoiceWorker
+from database.DBHandler import DBHandler
 
 user_calibration = AtomicBool(True)
 
+db_path = os.path.join(parent_dir, "database/db.sqlite")
+db = DBHandler(db_path)
 
 class PoseWorker(QObject):
     image_processed = Signal(QImage)
@@ -124,6 +127,8 @@ class CameraCalibration(QMainWindow):
         self.setup_camera_ui(self.ui.Camera_side, self.label_side)
         self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
         self.voice = VoiceWorker()
+        self.song = VoiceWorker()
+        self.main_window = main_window
 
     def refresh_cameras(self):
         cameras = QMediaDevices.videoInputs()
@@ -157,10 +162,13 @@ class CameraCalibration(QMainWindow):
         layout.addWidget(label)
 
     def handle_trening_started(self, started: bool):
-        # TODO: dodanie muzyki podczas treningu.
+        file_id = self.main_window.song_id
+        file_name = db.get_chosen_song(file_id)
         if started:
             self.voice.play("Trening rozpoczęty. Powodzenia!")
+            self.song.play(filename=file_name, to_delete=False, to_create=False, channel_id=1, volume=0.5)
         else:
+            self.song.stop_playing()
             self.voice.play("Trening zakończony. Świetna robota!")
 
     def handle_camera_frame_front(self, frame):
