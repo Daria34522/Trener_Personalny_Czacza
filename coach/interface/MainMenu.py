@@ -138,6 +138,7 @@ class MainMenu(QMainWindow):
 
     def profileSelection(self):
         self.stacked_widget.setCurrentWidget(self.profile_window)
+        self.voice.play("Wybierz swój profil lub utwórz nowy")
 
     def loggedUser(self, user):
         self.user_id = user

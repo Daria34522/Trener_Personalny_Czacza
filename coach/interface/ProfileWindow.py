@@ -63,7 +63,7 @@ def loadProfileImagesAndNames(Window):
                 background-color: #d1d4d7;
             }
         """
-    ## TODO wywalamy z bazy img_path
+
     for index, profile in enumerate(profiles_data):
         user_id, user_name = profile
         tile_number = index + 1
@@ -114,8 +114,7 @@ class ProfileWindow(QMainWindow):
         for i in range(1, 7):
             widget = self.findChild(QPushButton, f"ProfileImage_{i}")
             widget.clicked.connect(lambda event, w=widget: self.loadProfile(w))
-        self.voice = VoiceWorker()
-        self.voice.play("Wybierz swój profil lub utwórz nowy")
+
 
     # obsługa przycisków oraz funkcji okienka
     def createProfile(self):
