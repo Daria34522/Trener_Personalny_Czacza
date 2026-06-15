@@ -53,6 +53,8 @@ class Issues(StrEnum):
     MALO_WIDOCZNY_W_KAMERACH = "MALO_WIDOCZNY_W_KAMERACH"
     ZA_GLEBOKI_KROK = "ZA_GLEBOKI_KROK"
     ZA_DLUGI_KROK = "ZA_DLUGI_KROK"
+    TEMPO_ZA_SZYBKIE = "TEMPO_ZA_SZYBKIE"
+    TEMPO_ZA_WOLNE = "TEMPO_ZA_WOLNE"
 
     @staticmethod
     def to_polish(issue: Issues) -> str:
@@ -66,6 +68,8 @@ class Issues(StrEnum):
             "MALO_WIDOCZNY_W_KAMERACH": "Jesteś mało widoczny w kamerach – popraw ustawienie",
             "ZA_GLEBOKI_KROK": "Krok w przód/tył jest zbyt głęboki, przybliż troche stopy do siebie",
             "ZA_DLUGI_KROK": "Krok w lewo/prawo jest zbyt szeroki, przybliż troche stopy od siebie",
+            "TEMPO_ZA_SZYBKIE": "Twoje tempo jest za szybkie, zwolnij",
+            "TEMPO_ZA_WOLNE": "Twoje tempo jest za wolne, przyspiesz",
         }
         return translations.get(issue, "Nieznany błąd")
 
@@ -81,6 +85,8 @@ class Issues(StrEnum):
             "MALO_WIDOCZNY_W_KAMERACH": "Jesteś mało widoczny w kamerach – popraw ustawienie",
             "ZA_GLEBOKI_KROK": "Krok w przód/tył jest zbyt głęboki, przybliż troche stopy do siebie",
             "ZA_DLUGI_KROK": "Krok w lewo/prawo jest zbyt szeroki, przybliż troche stopy od siebie",
+            "TEMPO_ZA_SZYBKIE": "Twoje tempo jest za szybkie, zwolnij",
+            "TEMPO_ZA_WOLNE": "Twoje tempo jest za wolne, przyspiesz",
         }
         result = []
         for issue in issues:

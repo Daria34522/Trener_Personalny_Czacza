@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
 import os
-from sys import path
 import sys
-import threading
 import time
+from typing import TYPE_CHECKING, Counter
 import numpy as np
 from PySide6.QtMultimedia import (
     QCamera,
@@ -18,6 +18,7 @@ from PySide6.QtCore import QFile, Slot, Qt, QObject, Signal
 from PySide6.QtGui import QImage, QPixmap
 from atomicx import AtomicBool
 
+from coach.vision.analysis.step import StepDetector
 from coach.vision.pose import PoseDetector, PoseLandmarkSmoother, PoseDrawer
 from coach.vision.constants import Issues, PoseLandmark
 from coach.vision.errors import ErrorDetector
@@ -26,6 +27,9 @@ from coach.vision.analysis.quality import analyze_front, analyze_side
 
 from coach.interface.VoiceWorker import VoiceWorker
 from database.DBHandler import DBHandler
+
+if TYPE_CHECKING:
+    from coach.interface.MainMenu import MainMenu
 
 user_calibration = AtomicBool(True)
 
@@ -40,12 +44,15 @@ class PoseWorker(QObject):
     quality_result = Signal(QualityReport)
     trening_started = Signal(bool)
 
-    def __init__(self, direction: str = "front"):
+    def __init__(self, direction: str, main_window: MainMenu):
         super().__init__()
         self.detector = PoseDetector(result_callback=self.on_pose_result)
         self.smoother = PoseLandmarkSmoother(alpha=0.3)
         self.drawer = PoseDrawer()
         self.direction = direction
+        self.main_window = main_window
+        self.step_detector = StepDetector()
+        self.tempo = 0.0
         self.last_frame = None
 
         self.last_raised_hand_time = 0.0
@@ -62,23 +69,40 @@ class PoseWorker(QObject):
         if self.direction == "front":
             l_wrist = landmarks[PoseLandmark.LEFT_WRIST]
             l_shoulder = landmarks[PoseLandmark.LEFT_SHOULDER]
+            r_wrist = landmarks[PoseLandmark.RIGHT_WRIST]
+            r_shoulder = landmarks[PoseLandmark.RIGHT_SHOULDER]
 
-            up_horizontally_threshold = 0.20
-            if l_wrist.y + up_horizontally_threshold < l_shoulder.y:
+            up_horizontally_threshold = 0.15
+            left_raised = l_wrist.y + up_horizontally_threshold < l_shoulder.y
+            right_raised = r_wrist.y + up_horizontally_threshold < r_shoulder.y
+
+            if left_raised or right_raised:
                 current_time = time.time()
-
                 if current_time - self.last_raised_hand_time > self.cooldown_seconds:
                     user_calibration.flip()
                     self.trening_started.emit(not user_calibration.load())
                     self.last_raised_hand_time = current_time
 
         if not user_calibration.load():
+            combined_report = QualityReport()
+
+            if not self.tempo:
+                file_id = self.main_window.song_id
+                self.tempo = db.get_song_tempo(file_id)
+
             if self.direction == "front":
                 result = analyze_front(landmarks)
+                combined_report.issues.extend(result.issues)
+
+                step_report = self.step_detector.analyze(
+                    landmarks, timestamp_ms, self.tempo
+                )
+                combined_report.issues.extend(step_report.issues)
             else:
                 result = analyze_side(landmarks)
+                combined_report.issues.extend(result.issues)
 
-            self.quality_result.emit(result)
+            self.quality_result.emit(combined_report)
 
         processed = self.drawer.draw(
             self.last_frame.copy(), landmarks, user_calibration.load()
@@ -111,12 +135,14 @@ class CameraCalibration(QMainWindow):
         self.ui.Camera_front.setFixedSize(480, 640)
         self.ui.Camera_side.setFixedSize(480, 640)
 
-        self.worker_front = PoseWorker("front")
+        self.main_window = main_window
+
+        self.worker_front = PoseWorker("front", main_window)
         self.worker_front.image_processed.connect(self.update_display_front)
         self.worker_front.quality_result.connect(self.handle_report)
         self.worker_front.trening_started.connect(self.handle_trening_started)
 
-        self.worker_side = PoseWorker("side")
+        self.worker_side = PoseWorker("side", main_window)
         self.worker_side.image_processed.connect(self.update_display_side)
         self.worker_side.quality_result.connect(self.handle_report)
 
@@ -131,7 +157,11 @@ class CameraCalibration(QMainWindow):
         self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
         self.voice = VoiceWorker()
         self.song = VoiceWorker()
-        self.main_window = main_window
+
+        self.time_traning_start = 0
+        self.time_traning_end = 0
+
+        self.error_counter = Counter()
 
     def refresh_cameras(self):
         cameras = QMediaDevices.videoInputs()
@@ -148,7 +178,7 @@ class CameraCalibration(QMainWindow):
         self.session1.setVideoSink(self.sink1)
         self.sink1.videoFrameChanged.connect(self.handle_camera_frame_front)
 
-        self.camera2 = QCamera(cameras[1])  # obraz z kamerki
+        self.camera2 = QCamera(cameras[0])  # obraz z kamerki
         self.session2 = QMediaCaptureSession()
         self.sink2 = QVideoSink()
         self.session2.setCamera(self.camera2)
@@ -168,6 +198,7 @@ class CameraCalibration(QMainWindow):
         file_id = self.main_window.song_id
         file_name = db.get_chosen_song(file_id)
         if started:
+            self.time_traning_start = time.time()
             self.voice.play("Trening rozpoczęty. Powodzenia!")
             self.song.play(
                 filename=file_name,
@@ -176,9 +207,32 @@ class CameraCalibration(QMainWindow):
                 channel_id=1,
                 volume=0.5,
             )
-        else:
-            self.song.stop_playing()
-            self.voice.play("Trening zakończony. Świetna robota!")
+            return
+
+        self.time_traning_end = time.time()
+        self.song.stop_playing()
+        self.voice.play("Trening zakończony. Świetna robota!")
+        self.duration = self.time_traning_end - self.time_traning_start
+
+        if self.main_window.user_id == -1:
+            return
+
+        self.overall_msg = ""
+        self.tempo_msg = ""
+        self.posture_msg = ""
+        self.steps_msg = ""
+
+        db.add_statistics(
+            self.main_window.user_id,
+            datetime.now(),
+            1,
+            int(self.duration),
+            self.overall_msg,
+            None,
+            self.tempo_msg,
+            self.steps_msg,
+            self.posture_msg,
+        )
 
     def handle_camera_frame_front(self, frame):
         if not frame.isValid():
@@ -207,8 +261,28 @@ class CameraCalibration(QMainWindow):
         for issue in alerts:
             self.voice.play(Issues.to_polish(issue))
 
+        for issue in report.issues:
+            if issue in [
+                Issues.SLABE_PRZENIESIENIE_CIEZARU,
+                Issues.BIODRA_NIEROWNE,
+                Issues.RECE_ZA_NISKO,
+                Issues.RECE_ZA_WYSOKO,
+                Issues.KOLANO_UGIETE,
+            ]:
+                self.error_counter["posture"] += 1
+
+            elif issue in [Issues.ZA_GLEBOKI_KROK, Issues.ZA_DLUGI_KROK]:
+                self.error_counter["steps"] += 1
+
+            elif issue in [
+                Issues.TEMPO_ZA_SZYBKIE,
+                Issues.TEMPO_ZA_WOLNE,
+            ]:
+                self.error_counter["tempo"] += 1
+
         active = self.error_detector.get_active_errors()
         self.messageToUser("\n".join(Issues.to_polish_list(active)))
+        print("\n".join(Issues.to_polish_list(active)))
 
     @Slot(QImage)
     def update_display_front(self, q_img):
@@ -234,6 +308,7 @@ class CameraCalibration(QMainWindow):
         user_calibration.flip()
         self.camera1.stop()
         self.camera2.stop()
+
         self.parent().setCurrentIndex(0)
 
 
