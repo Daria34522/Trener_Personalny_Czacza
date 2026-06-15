@@ -10,7 +10,8 @@ from database.DBHandler import DBHandler
 
 from PIL import Image
 from PySide6.QtGui import QIcon, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QFrame, QHBoxLayout
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QFrame, QHBoxLayout, \
+    QMessageBox
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, QDate
 from VoiceWorker import VoiceWorker
@@ -41,13 +42,24 @@ class CalendarMenu(QMainWindow):
         self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
     def loadTrainingList(self): # Pokazanie całej listy treningowej
-        rows = db.get_training_plans(self.user_id)
-
         layout = self.ui.scrollAreaWidgetContents.layout()
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
+
+        # Zabezpieczenie przed brakiem konta na liście
+        if self.user_id == -1:
+            row_widget = QFrame()
+            row_layout = QHBoxLayout(row_widget)
+            lbl = QLabel("Wybierz konto, aby zobaczyć listę planów.")
+            lbl.setStyleSheet("font-style: italic; color: #e74c3c; font-weight: bold; border: none;")
+            row_layout.addWidget(lbl)
+            layout.addWidget(row_widget)
+            return
+
+        rows = db.get_training_plans(self.user_id)
+
         for row in rows:
             data, opis, czas = row
 
@@ -83,6 +95,10 @@ class CalendarMenu(QMainWindow):
             layout.addWidget(row_widget)
 
     def addEntry(self):  # Dodanie planu na konkretny dzień
+        if self.user_id == -1:
+            QMessageBox.warning(
+                self, "Nie wybrane konto", "Wybierz konto aby dodać trening"
+            )
         Time = self.ui.Time.time()
         Date = self.ui.Calendar2.selectedDate()
 
@@ -94,8 +110,11 @@ class CalendarMenu(QMainWindow):
         # Wybrany dzień
         datestr = Date.toString("yyyy-MM-dd")
 
-        if Target == "" or Date < QDate.currentDate():
-            self.ui.Message.setText("Cel jest pusty lub data jest z przeszłości")
+        if Target == "":
+            self.ui.Message.setText("Cel jest pusty")
+            return
+        if Date < QDate.currentDate():
+            self.ui.Message.setText("Wybrano date z przeszłości")
             return
 
         Total = 3600 * hours + 60 * minutes + seconds

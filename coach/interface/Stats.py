@@ -13,7 +13,7 @@ from database.DBHandler import DBHandler
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter
 from PySide6.QtCharts import QChart, QChartView, QBarSet, QBarSeries, QBarCategoryAxis, QValueAxis
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QDate
 from PySide6.QtWidgets import QFormLayout, QLabel, QVBoxLayout, QWidget
@@ -47,14 +47,23 @@ class Stats(QMainWindow):
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
         self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
 
+    def check_user(self):
+        if self.user_id == -1:
+            QMessageBox.warning(
+                self, "Nie wybrane konto", "Wybierz konto aby zobaczzyć statystyki"
+            )
+            return False
+        return True
 
     # Daty pobrane z ui zapisane są w tablicy posiadającej 3 elementy typu String tj. dzień, miesiąc, rok
     def drawGraph(self):
+        if not self.check_user():
+            return
         first_date = self.ui.From_date.text().split(".")
         second_date = self.ui.Until_date.text().split(".")
         first_date = first_date[2] + "-" + first_date[1] + "-" + first_date[0]
         second_date = second_date[2] + "-" + second_date[1] + "-" + second_date[0]
-        # TODO pobranie danych z bazy oraz narysowanie wykresu
+
         db.get_a_user(self.user_id)
         info = db.get_statistics_between_dates(self.user_id, first_date, second_date)
 
@@ -133,7 +142,10 @@ class Stats(QMainWindow):
 
         if not info:
             layout = QVBoxLayout()
-            no_data_lbl = QLabel("Brak statystyk dla wybranego dnia.")
+            if self.user_id == -1:
+                no_data_lbl = QLabel("Wybierz konto aby zobaczyć statystyki")
+            else:
+                no_data_lbl = QLabel("Brak statystyk dla wybranego dnia.")
             no_data_lbl.setStyleSheet("font-style: italic; color: #7f8c8d;")
             layout.addWidget(no_data_lbl)
             self.ui.Day_stats.setLayout(layout)
@@ -181,6 +193,10 @@ class Stats(QMainWindow):
         self.ui.Day_stats.setLayout(layout)
 
     def userNameAndGeneralStatistic(self):
+        if self.user_id == -1:
+            self.ui.Logged_user.setText("Nie wybrano konta")
+            self.ui.Exercise_time.setText("Wybierz konto aby zobaczyć czas")
+            return
         username = db.get_a_user(self.user_id)
         self.ui.Logged_user.setText(username)  # Nazwa użytkownika
         total = db.get_exercise_duration(self.user_id) / 60
