@@ -10,20 +10,29 @@ from database.DBHandler import DBHandler
 
 from PIL import Image
 from PySide6.QtGui import QIcon, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QFrame, QHBoxLayout, \
-    QMessageBox
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QFileDialog,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QFrame,
+    QHBoxLayout,
+    QMessageBox,
+)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize, QDate
-from VoiceWorker import VoiceWorker
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 class CalendarMenu(QMainWindow):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
-        ui_path = "ui/Calendar_menu.ui"
+        ui_path = f"{os.path.dirname(__file__)}/ui/Calendar_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
         if not ui_file.open(QFile.ReadOnly):
@@ -39,9 +48,9 @@ class CalendarMenu(QMainWindow):
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
         self.ui.Calendar1.clicked.connect(self.selectedDate)
-        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
 
-    def loadTrainingList(self): # Pokazanie całej listy treningowej
+    def loadTrainingList(self):  # Pokazanie całej listy treningowej
         layout = self.ui.scrollAreaWidgetContents.layout()
         while layout.count():
             child = layout.takeAt(0)
@@ -53,7 +62,9 @@ class CalendarMenu(QMainWindow):
             row_widget = QFrame()
             row_layout = QHBoxLayout(row_widget)
             lbl = QLabel("Wybierz konto, aby zobaczyć listę planów.")
-            lbl.setStyleSheet("font-style: italic; color: #e74c3c; font-weight: bold; border: none;")
+            lbl.setStyleSheet(
+                "font-style: italic; color: #e74c3c; font-weight: bold; border: none;"
+            )
             row_layout.addWidget(lbl)
             layout.addWidget(row_widget)
             return
@@ -76,16 +87,20 @@ class CalendarMenu(QMainWindow):
 
             label_opis = QLabel(str(opis))
             label_opis.setStyleSheet(
-                "font-size: 14px; color: #222222; font-weight: bold; border: none; background: transparent;")
+                "font-size: 14px; color: #222222; font-weight: bold; border: none; background: transparent;"
+            )
             label_data = QLabel(str(data))
-            label_data.setStyleSheet("font-size: 13px; color: #888888; border: none; background: transparent;")
+            label_data.setStyleSheet(
+                "font-size: 13px; color: #888888; border: none; background: transparent;"
+            )
             label_data.setAlignment(Qt.AlignCenter)
             Hours = czas // 3600
             Minutes = (czas % 3600) // 60
             Time = f"{Hours:02d}:{Minutes:02d}"
             label_czas = QLabel(Time)
             label_czas.setStyleSheet(
-                "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;")
+                "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;"
+            )
             label_czas.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
             row_layout.addWidget(label_opis, stretch=4)
@@ -153,6 +168,7 @@ class CalendarMenu(QMainWindow):
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
         self.main_window.voice.stop_playing()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -11,13 +11,21 @@ from database.DBHandler import DBHandler
 
 from PIL import Image
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QRadioButton
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QFileDialog,
+    QWidget,
+    QLabel,
+    QPushButton,
+    QRadioButton,
+)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QSize
-from VoiceWorker import VoiceWorker
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 def loadProfileImagesAndNames(Window):
     for i in range(1, 7):
@@ -32,7 +40,7 @@ def loadProfileImagesAndNames(Window):
             label.setText("")
             label.setVisible(False)
 
-    if hasattr(Window, 'radio_buttons'):
+    if hasattr(Window, "radio_buttons"):
         Window.radio_buttons.clear()
     else:
         Window.radio_buttons = []
@@ -91,6 +99,7 @@ def loadProfileImagesAndNames(Window):
             Window.ui.scrollArea.widget().layout().addWidget(radio)
             Window.radio_buttons.append(radio)
 
+
 class ProfileWindow(QMainWindow):
     def __init__(self, main_window):
         super().__init__()
@@ -104,7 +113,7 @@ class ProfileWindow(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Wybór profilu")
-        loadProfileImagesAndNames(self) # Ładowanie nazw użytkowików oraz zdjęć
+        loadProfileImagesAndNames(self)  # Ładowanie nazw użytkowików oraz zdjęć
 
         # Łączenie przycisków z metodami
         self.ui.Create_profile_button.clicked.connect(self.createProfile)
@@ -115,7 +124,6 @@ class ProfileWindow(QMainWindow):
         for i in range(1, 7):
             widget = self.findChild(QPushButton, f"ProfileImage_{i}")
             widget.clicked.connect(lambda event, w=widget: self.loadProfile(w))
-
 
     # obsługa przycisków oraz funkcji okienka
     def createProfile(self):
@@ -130,10 +138,14 @@ class ProfileWindow(QMainWindow):
         users = db.get_all_users()
         for user in users:
             if user[1] == user_name:
-                self.ui.Message_from_database.setText("Podana nazwa już istnieje. Proszę podać inną nazwę użytkownika.")
+                self.ui.Message_from_database.setText(
+                    "Podana nazwa już istnieje. Proszę podać inną nazwę użytkownika."
+                )
                 return
         if user_name == "":
-            self.ui.Message_from_database.setText("Proszę podać nazwe użytkownika")  # Wyświetlenie błędu w gui
+            self.ui.Message_from_database.setText(
+                "Proszę podać nazwe użytkownika"
+            )  # Wyświetlenie błędu w gui
             return
         try:
             img = Image.open(image_path)
@@ -159,11 +171,15 @@ class ProfileWindow(QMainWindow):
                 user_id = radio.property("user_id")
                 break
         if user_id == -1:
-            self.ui.Message_from_database.setText("Proszę wybrać profil")  # Wyświetlenie błędu w gui
+            self.ui.Message_from_database.setText(
+                "Proszę wybrać profil"
+            )  # Wyświetlenie błędu w gui
         else:
             # TODO niestety trzeba pobrać nazwę użytkownika żeby usunąć zdjęcie
             user_name = db.get_a_user(user_id)
-            os.remove(f"../database/pfps/{user_name}.png") # Odkomentować jak już będzie pobrana nazwa użytkownika
+            os.remove(
+                f"../database/pfps/{user_name}.png"
+            )  # Odkomentować jak już będzie pobrana nazwa użytkownika
             # TODO usunięcie profilu z bazy
             db.delete_user(user_id)
 
@@ -197,6 +213,7 @@ class ProfileWindow(QMainWindow):
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
         self.main_window.voice.stop_playing()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -12,15 +12,22 @@ from database.DBHandler import DBHandler
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter
-from PySide6.QtCharts import QChart, QChartView, QBarSet, QBarSeries, QBarCategoryAxis, QValueAxis
+from PySide6.QtCharts import (
+    QChart,
+    QChartView,
+    QBarSet,
+    QBarSeries,
+    QBarCategoryAxis,
+    QValueAxis,
+)
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QDate
 from PySide6.QtWidgets import QFormLayout, QLabel, QVBoxLayout, QWidget
-from VoiceWorker import VoiceWorker
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 class Stats(QMainWindow):
     def __init__(self, main_window):
@@ -45,7 +52,7 @@ class Stats(QMainWindow):
         # Łączenie przycisków z metodami
         self.ui.Draw_graph.clicked.connect(self.drawGraph)
         self.ui.Selected_date.selectionChanged.connect(self.displayDayStats)
-        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
 
     def check_user(self):
         if self.user_id == -1:
@@ -79,6 +86,7 @@ class Stats(QMainWindow):
 
             try:
                 from datetime import datetime
+
                 dt = datetime.strptime(data_str, "%Y-%m-%d")
                 ladna_data = dt.strftime("%d.%m.%Y")
             except:

@@ -119,7 +119,7 @@ class PoseWorker(QObject):
 
 
 class CameraCalibration(QMainWindow):
-    def __init__(self, main_window):
+    def __init__(self, main_window: MainMenu):
         super().__init__()
         ui_path = f"{os.path.dirname(__file__)}/ui/camera_calibration_menu.ui"
         loader = QUiLoader()
@@ -191,12 +191,12 @@ class CameraCalibration(QMainWindow):
 
         if self.main_window.user_id == -1:
             self.voice.play(
-                "Nie jesteś zalogowany, twoje statystyki nie będą zapisywane."
+                "Nie jesteś zalogowany twoje statystyki nie będą zapisywane. Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć"
             )
-
-        self.voice.play(
-            "Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę, aby rozpocząć trening."
-        )
+        else:
+            self.voice.play(
+                "Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć"
+            )
 
     def setup_camera_ui(self, container, label):
         layout = QHBoxLayout(container)
@@ -274,7 +274,7 @@ class CameraCalibration(QMainWindow):
         for issue in alerts:
             self.voice.play(Issues.to_polish(issue))
 
-        for issue in report.issues:
+        for issue in alerts:
             if issue in [
                 Issues.SLABE_PRZENIESIENIE_CIEZARU,
                 Issues.BIODRA_NIEROWNE,
@@ -295,7 +295,6 @@ class CameraCalibration(QMainWindow):
 
         active = self.error_detector.get_active_errors()
         self.messageToUser("\n".join(Issues.to_polish_list(active)))
-        print("\n".join(Issues.to_polish_list(active)))
 
     @Slot(QImage)
     def update_display_front(self, q_img):
@@ -318,6 +317,7 @@ class CameraCalibration(QMainWindow):
 
     def backToMainMenu(self):
         self.song.stop_playing()
+        self.voice.stop_playing()
         user_calibration.flip()
         if hasattr(self, "camera1"):
             self.camera1.stop()

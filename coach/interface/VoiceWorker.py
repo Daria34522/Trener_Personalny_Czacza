@@ -12,9 +12,9 @@ if parent_dir not in sys.path:
 from voice_control.voice_control import Speaker, Listener
 
 from database.DBHandler import DBHandler
+
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
-
 
 
 class VoiceWorker(QThread):
@@ -22,13 +22,21 @@ class VoiceWorker(QThread):
         super().__init__()
         self.text = ""
         self.filename = ""
-        self.to_delete= True
+        self.to_delete = True
         self.to_create = True
-        self.channel_id =0
-        self. volume =1.0
+        self.channel_id = 0
+        self.volume = 1.0
         self.current = None
 
-    def play(self, text = "", filename="example", to_delete=True, to_create=True, channel_id=0, volume=1.0):
+    def play(
+        self,
+        text="",
+        filename="example",
+        to_delete=True,
+        to_create=True,
+        channel_id=0,
+        volume=1.0,
+    ):
         self.text = text
         self.filename = filename
         self.to_delete = to_delete
@@ -39,7 +47,7 @@ class VoiceWorker(QThread):
             self.start()
 
     def run(self):
-        speaker = Speaker(voice_filename = self.filename, channel_id = self.channel_id)
+        speaker = Speaker(voice_filename=self.filename, channel_id=self.channel_id)
         if self.to_create is True:
             speaker.gen_speak(self.text)
 
@@ -56,4 +64,3 @@ class VoiceWorker(QThread):
             self.current.stop()
             self.current = None
             self.quit()
-

@@ -13,7 +13,7 @@ from database.DBHandler import DBHandler
 from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-from VoiceWorker import VoiceWorker
+from coach.interface.VoiceWorker import VoiceWorker
 
 from coach.interface.CalendarMenu import CalendarMenu
 from coach.interface.CameraCalibration import CameraCalibration
@@ -24,6 +24,7 @@ from coach.interface.TutorialMenu import TutorialMenu
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 def loadImages(Window):
     menu_button_style = """
@@ -51,7 +52,7 @@ def loadImages(Window):
         Window.ui.Stats: "assets/icons/statistics.png",
         Window.ui.Calendar: "assets/icons/calendar.png",
         Window.ui.Tutorial: "assets/icons/recommendations.png",
-        Window.ui.Profile_selection: "assets/icons/profile.png"
+        Window.ui.Profile_selection: "assets/icons/profile.png",
     }
 
     from PySide6.QtGui import QIcon
@@ -63,10 +64,11 @@ def loadImages(Window):
         btn.setIconSize(QSize(128, 128))
         btn.setText("")
 
+
 class MainMenu(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.stacked_widget = QStackedWidget() # Stackowanie okienek
+        self.stacked_widget = QStackedWidget()  # Stackowanie okienek
         self.setCentralWidget(self.stacked_widget)
 
         ui_path = f"{os.path.dirname(__file__)}/ui/main_menu.ui"
@@ -78,7 +80,7 @@ class MainMenu(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Trener")
-        loadImages(self) # ładowanie obrazków
+        loadImages(self)  # ładowanie obrazków
 
         # TODO Dane użytkownika
         self.user_id = -1
@@ -113,7 +115,6 @@ class MainMenu(QMainWindow):
         self.ui.Profile_selection.clicked.connect(self.profileSelection)
         self.voice = VoiceWorker()
         self.voice.play("Witaj w asystencie czaczy. Wybierz co chcesz zrobić")
-
 
     # obsługa przycisków oraz funkcji okienka
     def startTraining(self):
