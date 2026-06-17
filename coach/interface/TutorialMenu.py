@@ -1,11 +1,18 @@
+from __future__ import annotations
+
 import os
 import sys
 import time
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QUrl
-from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QUrl
+from PySide6.QtMultimedia import QAudioOutput
+from PySide6.QtMultimedia import QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget  # Prawdziwa klasa wideo
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QVBoxLayout
 
 
 class TutorialMenu(QMainWindow):
@@ -41,10 +48,10 @@ class TutorialMenu(QMainWindow):
 
         # obsługa wideo
         self.player.positionChanged.connect(
-            lambda p: self.ui.video_slider.setValue(int(p))
+            lambda p: self.ui.video_slider.setValue(int(p)),
         )
         self.player.durationChanged.connect(
-            lambda d: self.ui.video_slider.setRange(0, int(d))
+            lambda d: self.ui.video_slider.setRange(0, int(d)),
         )
         self.ui.video_slider.sliderMoved.connect(self.player.setPosition)
 
@@ -54,7 +61,7 @@ class TutorialMenu(QMainWindow):
         self.ui.volume_slider.valueChanged.connect(self.change_volume)
 
         self.player.setSource(
-            QUrl.fromLocalFile("tutorial/tut.mp4")
+            QUrl.fromLocalFile(f"{os.path.dirname(__file__)}/tutorial/tut.mp4"),
         )  # Ładowanie pliku mp4
 
         # Czekanie na załadowanie pliku i odpalenie pierwszej klatki

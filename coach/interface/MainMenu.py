@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import os
 import sys
-from sys import path
 from time import sleep
 
 current_dir = os.path.dirname(__file__)
@@ -47,12 +48,12 @@ def loadImages(Window):
     """
 
     buttons = {
-        Window.ui.Start_training: "assets/icons/dancestart.png",
-        Window.ui.Settings: "assets/icons/settings.png",
-        Window.ui.Stats: "assets/icons/statistics.png",
-        Window.ui.Calendar: "assets/icons/calendar.png",
-        Window.ui.Tutorial: "assets/icons/recommendations.png",
-        Window.ui.Profile_selection: "assets/icons/profile.png",
+        Window.ui.Start_training: f"{os.path.dirname(__file__)}/assets/icons/dancestart.png",
+        Window.ui.Settings: f"{os.path.dirname(__file__)}/assets/icons/settings.png",
+        Window.ui.Stats: f"{os.path.dirname(__file__)}/assets/icons/statistics.png",
+        Window.ui.Calendar: f"{os.path.dirname(__file__)}/assets/icons/calendar.png",
+        Window.ui.Tutorial: f"{os.path.dirname(__file__)}/assets/icons/recommendations.png",
+        Window.ui.Profile_selection: f"{os.path.dirname(__file__)}/assets/icons/profile.png",
     }
 
     from PySide6.QtGui import QIcon
