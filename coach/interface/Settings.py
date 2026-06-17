@@ -3,16 +3,16 @@ from __future__ import annotations
 import os
 import sys
 
+from PySide6.QtCore import QFile
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QRadioButton
+
+from coach.database.DBHandler import DBHandler
+
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-from database.DBHandler import DBHandler
-
-from PySide6.QtWidgets import QApplication, QMainWindow, QRadioButton
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
-
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
 

@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from atomicx import AtomicBool
-from database.DBHandler import DBHandler
 from PySide6.QtCore import QFile
 from PySide6.QtCore import QObject
 from PySide6.QtCore import Qt
@@ -27,6 +26,7 @@ from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QMainWindow
 
+from coach.database.DBHandler import DBHandler
 from coach.interface.VoiceWorker import VoiceWorker
 from coach.vision import feedback
 from coach.vision.analysis.quality import analyze_front

@@ -3,26 +3,22 @@ from __future__ import annotations
 import os
 import sys
 
+from PIL import Image
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QRadioButton
+
+from coach.database.DBHandler import DBHandler
+
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
-from database.DBHandler import DBHandler
-
-from PIL import Image
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QFileDialog,
-    QLabel,
-    QPushButton,
-    QRadioButton,
-)
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QSize
-
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
 
@@ -84,8 +80,8 @@ def loadProfileImagesAndNames(Window):
                 btn.setStyleSheet(profile_button_style)
                 btn.setIcon(
                     QIcon(
-                        f"{os.path.dirname(__file__)}/../database/pfps/{user_name}.png"
-                    )
+                        f"{os.path.dirname(__file__)}/../database/pfps/{user_name}.png",
+                    ),
                 )
                 btn.setIconSize(QSize(128, 128))
                 btn.setText("")

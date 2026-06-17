@@ -4,25 +4,23 @@ import os
 import sys
 from time import sleep
 
-current_dir = os.path.dirname(__file__)
-parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
-from database.DBHandler import DBHandler
-
-from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-from coach.interface.VoiceWorker import VoiceWorker
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QStackedWidget
 
+from coach.database.DBHandler import DBHandler
 from coach.interface.CalendarMenu import CalendarMenu
 from coach.interface.CameraCalibration import CameraCalibration
 from coach.interface.ProfileWindow import ProfileWindow
 from coach.interface.Settings import Settings
 from coach.interface.Stats import Stats
 from coach.interface.TutorialMenu import TutorialMenu
+from coach.interface.VoiceWorker import VoiceWorker
 
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
 
