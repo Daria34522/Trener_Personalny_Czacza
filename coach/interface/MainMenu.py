@@ -1,28 +1,29 @@
+from __future__ import annotations
+
 import os
 import sys
-from sys import path
+from time import sleep
 
-current_dir = os.path.dirname(__file__)
-parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
-from database.DBHandler import DBHandler
-
-from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-from VoiceWorker import VoiceWorker
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QStackedWidget
 
+from coach.database.DBHandler import DBHandler
 from coach.interface.CalendarMenu import CalendarMenu
 from coach.interface.CameraCalibration import CameraCalibration
 from coach.interface.ProfileWindow import ProfileWindow
 from coach.interface.Settings import Settings
 from coach.interface.Stats import Stats
 from coach.interface.TutorialMenu import TutorialMenu
+from coach.interface.VoiceWorker import VoiceWorker
 
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 def loadImages(Window):
     menu_button_style = """
@@ -45,12 +46,12 @@ def loadImages(Window):
     """
 
     buttons = {
-        Window.ui.Start_training: "assets/icons/dancestart.png",
-        Window.ui.Settings: "assets/icons/settings.png",
-        Window.ui.Stats: "assets/icons/statistics.png",
-        Window.ui.Calendar: "assets/icons/calendar.png",
-        Window.ui.Tutorial: "assets/icons/recommendations.png",
-        Window.ui.Profile_selection: "assets/icons/profile.png"
+        Window.ui.Start_training: f"{os.path.dirname(__file__)}/assets/icons/dancestart.png",
+        Window.ui.Settings: f"{os.path.dirname(__file__)}/assets/icons/settings.png",
+        Window.ui.Stats: f"{os.path.dirname(__file__)}/assets/icons/statistics.png",
+        Window.ui.Calendar: f"{os.path.dirname(__file__)}/assets/icons/calendar.png",
+        Window.ui.Tutorial: f"{os.path.dirname(__file__)}/assets/icons/recommendations.png",
+        Window.ui.Profile_selection: f"{os.path.dirname(__file__)}/assets/icons/profile.png",
     }
 
     from PySide6.QtGui import QIcon
@@ -62,10 +63,11 @@ def loadImages(Window):
         btn.setIconSize(QSize(128, 128))
         btn.setText("")
 
+
 class MainMenu(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.stacked_widget = QStackedWidget() # Stackowanie okienek
+        self.stacked_widget = QStackedWidget()  # Stackowanie okienek
         self.setCentralWidget(self.stacked_widget)
 
         ui_path = f"{os.path.dirname(__file__)}/ui/main_menu.ui"
@@ -77,7 +79,7 @@ class MainMenu(QMainWindow):
         self.ui = loader.load(ui_file, self)
         ui_file.close()
         self.setWindowTitle("Trener")
-        loadImages(self) # ładowanie obrazków
+        loadImages(self)  # ładowanie obrazków
 
         # TODO Dane użytkownika
         self.user_id = -1
@@ -99,7 +101,7 @@ class MainMenu(QMainWindow):
         self.stacked_widget.addWidget(self.stats_window)
         self.stacked_widget.addWidget(self.tutorial_window)
 
-        self.stacked_widget.setCurrentWidget(self.profile_window)
+        self.stacked_widget.setCurrentWidget(self.ui)
 
         self.showMaximized()
 
@@ -113,30 +115,41 @@ class MainMenu(QMainWindow):
         self.voice = VoiceWorker()
         self.voice.play("Witaj w asystencie czaczy. Wybierz co chcesz zrobić")
 
-
-    # TODO Obsługa przycisków otwierających poszczególne okienka oraz realizująca ich funkcje w mainie
-    pass
-
     # obsługa przycisków oraz funkcji okienka
     def startTraining(self):
+        self.camera_window.refresh_cameras()
         self.stacked_widget.setCurrentWidget(self.camera_window)
+        self.voice.stop_playing()
 
     def settings(self):
         self.stacked_widget.setCurrentWidget(self.settings_window)
+        self.voice.stop_playing()
+        sleep(0.5)
+        self.voice.play("Wybierz piosenkę do której chcesz ćwiczyć")
 
     def stats(self):
         self.stats_window.setProfile(self.user_id)
         self.stacked_widget.setCurrentWidget(self.stats_window)
+        self.voice.stop_playing()
+        sleep(0.5)
+        self.voice.play("Oto twoje statystyki")
 
     def calendar(self):
         self.calendar_window.setProfile(self.user_id)
         self.stacked_widget.setCurrentWidget(self.calendar_window)
+        self.voice.stop_playing()
+        sleep(0.5)
+        self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
 
     def tutorial(self):
         self.stacked_widget.setCurrentWidget(self.tutorial_window)
+        self.voice.stop_playing()
 
     def profileSelection(self):
         self.stacked_widget.setCurrentWidget(self.profile_window)
+        self.voice.stop_playing()
+        sleep(0.5)
+        self.voice.play("Wybierz swój profil lub utwórz nowy")
 
     def loggedUser(self, user):
         self.user_id = user

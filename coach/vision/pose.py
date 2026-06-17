@@ -1,9 +1,13 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+
 import cv2
 import mediapipe as mp
-from mediapipe.tasks.python import vision
 from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+
 from coach.vision.constants import MODEL_PATH
-from dataclasses import dataclass
 
 
 class PoseDetector:

@@ -1,57 +1,74 @@
 from __future__ import annotations
 
 import os
-from sys import path
 import sys
-import threading
 import time
+from datetime import datetime
+from typing import Counter
+from typing import TYPE_CHECKING
+
 import numpy as np
-from PySide6.QtMultimedia import (
-    QCamera,
-    QMediaCaptureSession,
-    QMediaDevices,
-    QVideoSink,
-)
-from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QLabel
+from atomicx import AtomicBool
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtGui import QImage
+from PySide6.QtGui import QPixmap
+from PySide6.QtMultimedia import QCamera
+from PySide6.QtMultimedia import QMediaCaptureSession
+from PySide6.QtMultimedia import QMediaDevices
+from PySide6.QtMultimedia import QVideoSink
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Slot, Qt, QObject, Signal
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QMainWindow
 
-from coach.vision.pose import PoseDetector, PoseLandmarkSmoother, PoseDrawer
-from coach.vision.constants import Issues
-from coach.vision.errors import ErrorDetector
-from coach.vision.analysis.quality import QualityReport
-from coach.vision.analysis.quality import analyze_front, analyze_side
-
+from coach.database.DBHandler import DBHandler
 from coach.interface.VoiceWorker import VoiceWorker
+from coach.vision import feedback
+from coach.vision.analysis.quality import analyze_front
+from coach.vision.analysis.quality import analyze_side
+from coach.vision.analysis.quality import QualityReport
+from coach.vision.analysis.step import StepDetector
+from coach.vision.constants import Issues
+from coach.vision.constants import PoseLandmark
+from coach.vision.errors import ErrorDetector
+from coach.vision.pose import PoseDetector
+from coach.vision.pose import PoseDrawer
+from coach.vision.pose import PoseLandmarkSmoother
 
+if TYPE_CHECKING:
+    from coach.interface.MainMenu import MainMenu
 
-class AtomicBoolean:
-    def __init__(self, initial: bool = False):
-        self._lock = threading.Lock()
-        self.value = initial
+user_calibration = AtomicBool(True)
 
-    def toggle(self):
-        with self._lock:
-            self.value = not self.value
-
-    def get(self) -> bool:
-        with self._lock:
-            return self.value
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+db_path = os.path.join(parent_dir, "database/db.sqlite")
+db = DBHandler(db_path)
 
 
 class PoseWorker(QObject):
     image_processed = Signal(QImage)
     quality_result = Signal(QualityReport)
+    trening_started = Signal(bool)
 
-    def __init__(self, direction: str = "front"):
+    def __init__(self, direction: str, main_window: MainMenu):
         super().__init__()
         self.detector = PoseDetector(result_callback=self.on_pose_result)
         self.smoother = PoseLandmarkSmoother(alpha=0.3)
         self.drawer = PoseDrawer()
-        self.user_calibration = AtomicBoolean(True)
         self.direction = direction
+        self.main_window = main_window
+        self.step_detector = StepDetector()
+        self.tempo = 0.0
         self.last_frame = None
+
+        self.last_raised_hand_time = 0.0
+        self.cooldown_seconds = 2
 
     def on_pose_result(self, result, output_image, timestamp_ms):
         if self.last_frame is None:
@@ -62,14 +79,49 @@ class PoseWorker(QObject):
 
         landmarks = self.smoother.smooth(result.pose_landmarks[0])
         if self.direction == "front":
-            result = analyze_front(landmarks)
-        else:
-            result = analyze_side(landmarks)
+            l_wrist = landmarks[PoseLandmark.LEFT_WRIST]
+            l_shoulder = landmarks[PoseLandmark.LEFT_SHOULDER]
+            r_wrist = landmarks[PoseLandmark.RIGHT_WRIST]
+            r_shoulder = landmarks[PoseLandmark.RIGHT_SHOULDER]
 
-        self.quality_result.emit(result)
+            up_horizontally_threshold = 0.15
+            left_raised = l_wrist.y + up_horizontally_threshold < l_shoulder.y
+            right_raised = r_wrist.y + up_horizontally_threshold < r_shoulder.y
+
+            if left_raised or right_raised:
+                current_time = time.time()
+                if current_time - self.last_raised_hand_time > self.cooldown_seconds:
+                    user_calibration.flip()
+                    self.trening_started.emit(not user_calibration.load())
+                    self.last_raised_hand_time = current_time
+
+        if not user_calibration.load():
+            combined_report = QualityReport()
+
+            if not self.tempo:
+                file_id = self.main_window.song_id
+                self.tempo = db.get_song_tempo(file_id)
+
+            if self.direction == "front":
+                result = analyze_front(landmarks)
+                combined_report.issues.extend(result.issues)
+
+                step_report = self.step_detector.analyze(
+                    landmarks,
+                    timestamp_ms,
+                    self.tempo,
+                )
+                combined_report.issues.extend(step_report.issues)
+            else:
+                result = analyze_side(landmarks)
+                combined_report.issues.extend(result.issues)
+
+            self.quality_result.emit(combined_report)
 
         processed = self.drawer.draw(
-            self.last_frame.copy(), landmarks, self.user_calibration.get()
+            self.last_frame.copy(),
+            landmarks,
+            user_calibration.load(),
         )
         h, w, ch = processed.shape
         q_img = QImage(processed.data, w, h, ch * w, QImage.Format.Format_RGB888)
@@ -82,7 +134,7 @@ class PoseWorker(QObject):
 
 
 class CameraCalibration(QMainWindow):
-    def __init__(self, main_window):
+    def __init__(self, main_window: MainMenu):
         super().__init__()
         ui_path = f"{os.path.dirname(__file__)}/ui/camera_calibration_menu.ui"
         loader = QUiLoader()
@@ -99,28 +151,42 @@ class CameraCalibration(QMainWindow):
         self.ui.Camera_front.setFixedSize(480, 640)
         self.ui.Camera_side.setFixedSize(480, 640)
 
-        self.worker_front = PoseWorker("front")
+        self.main_window = main_window
+
+        self.worker_front = PoseWorker("front", main_window)
         self.worker_front.image_processed.connect(self.update_display_front)
         self.worker_front.quality_result.connect(self.handle_report)
+        self.worker_front.trening_started.connect(self.handle_trening_started)
 
-        self.worker_side = PoseWorker("side")
+        self.worker_side = PoseWorker("side", main_window)
         self.worker_side.image_processed.connect(self.update_display_side)
         self.worker_side.quality_result.connect(self.handle_report)
 
         self.error_detector = ErrorDetector(
-            window_size=60, threshold=20, cooldown_frames=240
+            window_size=60,
+            threshold=20,
+            cooldown_frames=240,
         )
 
         self.label_front = QLabel()
         self.label_side = QLabel()
         self.setup_camera_ui(self.ui.Camera_front, self.label_front)
         self.setup_camera_ui(self.ui.Camera_side, self.label_side)
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
+        self.voice = VoiceWorker()
+        self.song = VoiceWorker()
 
+        self.time_traning_start = 0
+        self.time_traning_end = 0
+
+        self.error_counter = Counter()
+
+    def refresh_cameras(self):
         cameras = QMediaDevices.videoInputs()
         if len(cameras) < 2:
             msg = "Nie wykryto dwóch kamer. Podłącz dwie kamery i uruchom ponownie."
             self.messageToUser(msg)
-            self.voice.play(text= msg)
+            self.voice.play(text=msg)
             return
 
         self.camera1 = QCamera(cameras[2])  # obraz z kamerki
@@ -130,7 +196,7 @@ class CameraCalibration(QMainWindow):
         self.session1.setVideoSink(self.sink1)
         self.sink1.videoFrameChanged.connect(self.handle_camera_frame_front)
 
-        self.camera2 = QCamera(cameras[1])  # obraz z kamerki
+        self.camera2 = QCamera(cameras[0])  # obraz z kamerki
         self.session2 = QMediaCaptureSession()
         self.sink2 = QVideoSink()
         self.session2.setCamera(self.camera2)
@@ -139,13 +205,64 @@ class CameraCalibration(QMainWindow):
 
         self.camera1.start()
         self.camera2.start()
-        self.voice = VoiceWorker()
-        self.voice.play("Ustaw się tak abyś na obu widokach kamery był cały widoczny")
+
+        if self.main_window.user_id == -1:
+            self.voice.play(
+                "Nie jesteś zalogowany twoje statystyki nie będą zapisywane. Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć",
+            )
+        else:
+            self.voice.play(
+                "Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć",
+            )
 
     def setup_camera_ui(self, container, label):
         layout = QHBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(label)
+
+    def handle_trening_started(self, started: bool):
+        file_id = self.main_window.song_id
+        file_name = db.get_chosen_song(file_id)
+        if started:
+            self.time_traning_start = time.time()
+            self.voice.play("Trening rozpoczęty. Powodzenia!")
+            self.song.play(
+                filename=file_name,
+                to_delete=False,
+                to_create=False,
+                channel_id=1,
+                volume=0.5,
+            )
+            return
+
+        self.time_traning_end = time.time()
+        self.song.stop_playing()
+        self.voice.play("Trening zakończony. Świetna robota!")
+        self.duration = self.time_traning_end - self.time_traning_start
+
+        if self.main_window.user_id == -1:
+            return
+
+        self.overall_msg = feedback.session_summary(
+            self.error_counter["posture"],
+            self.error_counter["steps"],
+            self.error_counter["tempo"],
+        )
+        self.tempo_msg = feedback.tempo_feedback(self.error_counter["tempo"])
+        self.posture_msg = feedback.posture_feedback(self.error_counter["posture"])
+        self.steps_msg = feedback.steps_feedback(self.error_counter["steps"])
+
+        db.add_statistics(
+            self.main_window.user_id,
+            datetime.now(),
+            1,
+            int(self.duration),
+            self.overall_msg,
+            None,
+            self.tempo_msg,
+            self.steps_msg,
+            self.posture_msg,
+        )
 
     def handle_camera_frame_front(self, frame):
         if not frame.isValid():
@@ -172,8 +289,26 @@ class CameraCalibration(QMainWindow):
 
         alerts = self.error_detector.show_alerts()
         for issue in alerts:
-            ...
             self.voice.play(Issues.to_polish(issue))
+
+        for issue in alerts:
+            if issue in [
+                Issues.SLABE_PRZENIESIENIE_CIEZARU,
+                Issues.BIODRA_NIEROWNE,
+                Issues.RECE_ZA_NISKO,
+                Issues.RECE_ZA_WYSOKO,
+                Issues.KOLANO_UGIETE,
+            ]:
+                self.error_counter["posture"] += 1
+
+            elif issue in [Issues.ZA_GLEBOKI_KROK, Issues.ZA_DLUGI_KROK]:
+                self.error_counter["steps"] += 1
+
+            elif issue in [
+                Issues.TEMPO_ZA_SZYBKIE,
+                Issues.TEMPO_ZA_WOLNE,
+            ]:
+                self.error_counter["tempo"] += 1
 
         active = self.error_detector.get_active_errors()
         self.messageToUser("\n".join(Issues.to_polish_list(active)))
@@ -182,20 +317,34 @@ class CameraCalibration(QMainWindow):
     def update_display_front(self, q_img):
         pixmap = QPixmap.fromImage(q_img)
         self.label_front.setPixmap(
-            pixmap.scaled(self.label_front.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            pixmap.scaled(self.label_front.size(), Qt.AspectRatioMode.KeepAspectRatio),
         )
 
     @Slot(QImage)
     def update_display_side(self, q_img):
         pixmap = QPixmap.fromImage(q_img)
         self.label_side.setPixmap(
-            pixmap.scaled(self.label_side.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            pixmap.scaled(self.label_side.size(), Qt.AspectRatioMode.KeepAspectRatio),
         )
 
     def messageToUser(
-        self, message
+        self,
+        message,
     ):  # metoda pozwala wyświetlić komunikat dla użytkownika w polu 'Informacje' np. o niepoprawnym ustawieniu kamery
         self.ui.Message_from_app.setText(message)
+
+    def backToMainMenu(self):
+        self.song.stop_playing()
+        self.voice.stop_playing()
+        user_calibration.flip()
+        if hasattr(self, "camera1"):
+            self.camera1.stop()
+
+        if hasattr(self, "camera2"):
+            self.camera2.stop()
+
+        self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
 
 
 if __name__ == "__main__":

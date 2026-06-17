@@ -8,3 +8,5 @@ opencv-python
 gTTS
 pygame
 SpeechRecognition
+atomicx
+pre-commit

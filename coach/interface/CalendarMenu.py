@@ -1,28 +1,32 @@
+from __future__ import annotations
+
 import os
 import sys
-from sys import path
+
+from PySide6.QtCore import QDate
+from PySide6.QtCore import QFile
+from PySide6.QtGui import Qt
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QFrame
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMessageBox
+
+from coach.database.DBHandler import DBHandler
 
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-from database.DBHandler import DBHandler
-
-from PIL import Image
-from PySide6.QtGui import QIcon, Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QWidget, QLabel, QPushButton, QFrame, QHBoxLayout
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QSize, QDate
-from VoiceWorker import VoiceWorker
-
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
+
 
 class CalendarMenu(QMainWindow):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
-        ui_path = "ui/Calendar_menu.ui"
+        ui_path = f"{os.path.dirname(__file__)}/ui/Calendar_menu.ui"
         loader = QUiLoader()
         ui_file = QFile(ui_path)
         if not ui_file.open(QFile.ReadOnly):
@@ -38,19 +42,29 @@ class CalendarMenu(QMainWindow):
         # Podpinanie metod pod przyciski
         self.ui.Add_entry.clicked.connect(self.addEntry)
         self.ui.Calendar1.clicked.connect(self.selectedDate)
-        self.ui.Main_menu.clicked.connect(self.backToMainMenu) # Menu główne
+        self.ui.Main_menu.clicked.connect(self.backToMainMenu)  # Menu główne
 
-        self.voice = VoiceWorker()
-        self.voice.play("Witaj w kalendarzu, możesz tu zaplanowć swoje treningi")
-
-    def loadTrainingList(self): # Pokazanie całej listy treningowej
-        rows = db.get_training_plans(self.user_id)
-
+    def loadTrainingList(self):  # Pokazanie całej listy treningowej
         layout = self.ui.scrollAreaWidgetContents.layout()
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
+
+        # Zabezpieczenie przed brakiem konta na liście
+        if self.user_id == -1:
+            row_widget = QFrame()
+            row_layout = QHBoxLayout(row_widget)
+            lbl = QLabel("Wybierz konto, aby zobaczyć listę planów.")
+            lbl.setStyleSheet(
+                "font-style: italic; color: #e74c3c; font-weight: bold; border: none;",
+            )
+            row_layout.addWidget(lbl)
+            layout.addWidget(row_widget)
+            return
+
+        rows = db.get_training_plans(self.user_id)
+
         for row in rows:
             data, opis, czas = row
 
@@ -67,16 +81,20 @@ class CalendarMenu(QMainWindow):
 
             label_opis = QLabel(str(opis))
             label_opis.setStyleSheet(
-                "font-size: 14px; color: #222222; font-weight: bold; border: none; background: transparent;")
+                "font-size: 14px; color: #222222; font-weight: bold; border: none; background: transparent;",
+            )
             label_data = QLabel(str(data))
-            label_data.setStyleSheet("font-size: 13px; color: #888888; border: none; background: transparent;")
+            label_data.setStyleSheet(
+                "font-size: 13px; color: #888888; border: none; background: transparent;",
+            )
             label_data.setAlignment(Qt.AlignCenter)
             Hours = czas // 3600
             Minutes = (czas % 3600) // 60
             Time = f"{Hours:02d}:{Minutes:02d}"
             label_czas = QLabel(Time)
             label_czas.setStyleSheet(
-                "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;")
+                "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;",
+            )
             label_czas.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
             row_layout.addWidget(label_opis, stretch=4)
@@ -86,6 +104,12 @@ class CalendarMenu(QMainWindow):
             layout.addWidget(row_widget)
 
     def addEntry(self):  # Dodanie planu na konkretny dzień
+        if self.user_id == -1:
+            QMessageBox.warning(
+                self,
+                "Nie wybrane konto",
+                "Wybierz konto aby dodać trening",
+            )
         Time = self.ui.Time.time()
         Date = self.ui.Calendar2.selectedDate()
 
@@ -97,8 +121,11 @@ class CalendarMenu(QMainWindow):
         # Wybrany dzień
         datestr = Date.toString("yyyy-MM-dd")
 
-        if Target == "" or Date < QDate.currentDate():
-            self.ui.Message.setText("Cel jest pusty lub data jest z przeszłości")
+        if Target == "":
+            self.ui.Message.setText("Cel jest pusty")
+            return
+        if Date < QDate.currentDate():
+            self.ui.Message.setText("Wybrano date z przeszłości")
             return
 
         Total = 3600 * hours + 60 * minutes + seconds
@@ -106,7 +133,6 @@ class CalendarMenu(QMainWindow):
 
         self.ui.Message.setText("Wpis został dodany")
         self.loadTrainingList()
-        pass
 
     def selectedDate(self):  # Wypisanie planu na wybrany dzień
         Date = self.ui.Calendar1.selectedDate()
@@ -136,6 +162,8 @@ class CalendarMenu(QMainWindow):
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)
+        self.main_window.voice.stop_playing()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
