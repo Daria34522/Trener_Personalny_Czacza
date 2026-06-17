@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import os
 import sys
-from sys import path
 
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
@@ -67,7 +68,6 @@ class Settings(QMainWindow):
             print(selected_song_title, selected_song_id)
             self.parent().parent().selectedSong(selected_song_id)
             self.parent().setCurrentIndex(0)
-            pass
 
     def backToMainMenu(self):
         self.parent().setCurrentIndex(0)

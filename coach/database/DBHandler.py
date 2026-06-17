@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sqlite3
 
 
@@ -54,7 +56,7 @@ class DBHandler:
         with self.connect() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT song_id, title, artist, audio_file FROM music ORDER BY RANDOM() LIMIT 1"
+                "SELECT song_id, title, artist, audio_file FROM music ORDER BY RANDOM() LIMIT 1",
             )
             result = cursor.fetchone()
             return result[0] if result else None
@@ -63,7 +65,8 @@ class DBHandler:
         with self.connect() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT audio_file FROM music WHERE song_id = ?", (music_id,)
+                "SELECT audio_file FROM music WHERE song_id = ?",
+                (music_id,),
             )
             res = cursor.fetchone()
             return res[0] if res else None
@@ -115,7 +118,7 @@ class DBHandler:
         with self.connect() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                """SELECT "date", goal, duration_seconds FROM training_plan 
+                """SELECT "date", goal, duration_seconds FROM training_plan
                 WHERE user_id = ? AND "date" > DATE('now') ORDER BY date ASC""",
                 (user_id,),
             )

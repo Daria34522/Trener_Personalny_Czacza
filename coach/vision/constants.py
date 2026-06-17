@@ -5,7 +5,9 @@ from enum import IntEnum
 from enum import StrEnum
 
 MODEL_PATH = os.path.join(
-    os.path.dirname(__file__), "assets", "pose_landmarker_full.task"
+    os.path.dirname(__file__),
+    "assets",
+    "pose_landmarker_full.task",
 )
 
 

@@ -1,15 +1,16 @@
+from __future__ import annotations
+
+import os
 import sys
-from time import sleep
 
 from PySide6.QtCore import QThread
-import os
 
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
-from voice_control.voice_control import Speaker, Listener
+from voice_control.voice_control import Speaker
 
 from database.DBHandler import DBHandler
 

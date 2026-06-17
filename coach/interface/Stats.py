@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import os
 import sys
-from sys import path
 
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
@@ -57,7 +58,9 @@ class Stats(QMainWindow):
     def check_user(self):
         if self.user_id == -1:
             QMessageBox.warning(
-                self, "Nie wybrane konto", "Wybierz konto aby zobaczzyć statystyki"
+                self,
+                "Nie wybrane konto",
+                "Wybierz konto aby zobaczzyć statystyki",
             )
             return False
         return True
@@ -133,7 +136,6 @@ class Stats(QMainWindow):
         widok_wykresu = QChartView(wykres)
         widok_wykresu.setRenderHint(QPainter.Antialiasing)
         layout.addWidget(widok_wykresu)
-        pass
 
     def displayDayStats(self):
         date = self.ui.Selected_date.selectedDate().toString("yyyy-MM-dd")
@@ -194,7 +196,7 @@ class Stats(QMainWindow):
 
         comment_lbl = QLabel(f"*{comment}*")
         comment_lbl.setStyleSheet(
-            "color: #0096FF; font-weight: bold; font-size: 17px; margin-top: 12px;"
+            "color: #0096FF; font-weight: bold; font-size: 17px; margin-top: 12px;",
         )
         comment_lbl.setWordWrap(True)
         layout.addRow(comment_lbl)

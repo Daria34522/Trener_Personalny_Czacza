@@ -7,7 +7,10 @@ from coach.vision.constants import Issues
 
 class ErrorDetector:
     def __init__(
-        self, window_size: int = 15, threshold: int = 10, cooldown_frames: int = 90
+        self,
+        window_size: int = 15,
+        threshold: int = 10,
+        cooldown_frames: int = 90,
     ) -> None:
         self.window_size = window_size
         self.threshold = threshold

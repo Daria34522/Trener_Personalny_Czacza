@@ -1,33 +1,44 @@
 from __future__ import annotations
 
-from datetime import datetime
 import os
 import sys
 import time
-from typing import TYPE_CHECKING, Counter
-import numpy as np
-from PySide6.QtMultimedia import (
-    QCamera,
-    QMediaCaptureSession,
-    QMediaDevices,
-    QVideoSink,
-)
-from PySide6.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QLabel
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Slot, Qt, QObject, Signal
-from PySide6.QtGui import QImage, QPixmap
-from atomicx import AtomicBool
+from datetime import datetime
+from typing import Counter
+from typing import TYPE_CHECKING
 
-from coach.vision.analysis.step import StepDetector
-from coach.vision.pose import PoseDetector, PoseLandmarkSmoother, PoseDrawer
-from coach.vision.constants import Issues, PoseLandmark
-from coach.vision.errors import ErrorDetector
-from coach.vision.analysis.quality import QualityReport
-from coach.vision.analysis.quality import analyze_front, analyze_side
-from coach.vision import feedback
+import numpy as np
+from atomicx import AtomicBool
+from database.DBHandler import DBHandler
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtGui import QImage
+from PySide6.QtGui import QPixmap
+from PySide6.QtMultimedia import QCamera
+from PySide6.QtMultimedia import QMediaCaptureSession
+from PySide6.QtMultimedia import QMediaDevices
+from PySide6.QtMultimedia import QVideoSink
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QMainWindow
 
 from coach.interface.VoiceWorker import VoiceWorker
-from database.DBHandler import DBHandler
+from coach.vision import feedback
+from coach.vision.analysis.quality import analyze_front
+from coach.vision.analysis.quality import analyze_side
+from coach.vision.analysis.quality import QualityReport
+from coach.vision.analysis.step import StepDetector
+from coach.vision.constants import Issues
+from coach.vision.constants import PoseLandmark
+from coach.vision.errors import ErrorDetector
+from coach.vision.pose import PoseDetector
+from coach.vision.pose import PoseDrawer
+from coach.vision.pose import PoseLandmarkSmoother
 
 if TYPE_CHECKING:
     from coach.interface.MainMenu import MainMenu
@@ -96,7 +107,9 @@ class PoseWorker(QObject):
                 combined_report.issues.extend(result.issues)
 
                 step_report = self.step_detector.analyze(
-                    landmarks, timestamp_ms, self.tempo
+                    landmarks,
+                    timestamp_ms,
+                    self.tempo,
                 )
                 combined_report.issues.extend(step_report.issues)
             else:
@@ -106,7 +119,9 @@ class PoseWorker(QObject):
             self.quality_result.emit(combined_report)
 
         processed = self.drawer.draw(
-            self.last_frame.copy(), landmarks, user_calibration.load()
+            self.last_frame.copy(),
+            landmarks,
+            user_calibration.load(),
         )
         h, w, ch = processed.shape
         q_img = QImage(processed.data, w, h, ch * w, QImage.Format.Format_RGB888)
@@ -148,7 +163,9 @@ class CameraCalibration(QMainWindow):
         self.worker_side.quality_result.connect(self.handle_report)
 
         self.error_detector = ErrorDetector(
-            window_size=60, threshold=20, cooldown_frames=240
+            window_size=60,
+            threshold=20,
+            cooldown_frames=240,
         )
 
         self.label_front = QLabel()
@@ -191,11 +208,11 @@ class CameraCalibration(QMainWindow):
 
         if self.main_window.user_id == -1:
             self.voice.play(
-                "Nie jesteś zalogowany twoje statystyki nie będą zapisywane. Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć"
+                "Nie jesteś zalogowany twoje statystyki nie będą zapisywane. Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć",
             )
         else:
             self.voice.play(
-                "Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć"
+                "Ustaw się tak abyś na obu widokach kamery był w białych ramkach i podnieś rękę aby rozpocząć",
             )
 
     def setup_camera_ui(self, container, label):
@@ -300,18 +317,19 @@ class CameraCalibration(QMainWindow):
     def update_display_front(self, q_img):
         pixmap = QPixmap.fromImage(q_img)
         self.label_front.setPixmap(
-            pixmap.scaled(self.label_front.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            pixmap.scaled(self.label_front.size(), Qt.AspectRatioMode.KeepAspectRatio),
         )
 
     @Slot(QImage)
     def update_display_side(self, q_img):
         pixmap = QPixmap.fromImage(q_img)
         self.label_side.setPixmap(
-            pixmap.scaled(self.label_side.size(), Qt.AspectRatioMode.KeepAspectRatio)
+            pixmap.scaled(self.label_side.size(), Qt.AspectRatioMode.KeepAspectRatio),
         )
 
     def messageToUser(
-        self, message
+        self,
+        message,
     ):  # metoda pozwala wyświetlić komunikat dla użytkownika w polu 'Informacje' np. o niepoprawnym ustawieniu kamery
         self.ui.Message_from_app.setText(message)
 

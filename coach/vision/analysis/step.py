@@ -1,11 +1,14 @@
 from __future__ import annotations
+
 import math
 from collections import deque
+
 import numpy as np
 
-from coach.vision.constants import PoseLandmark, Issues
-from coach.vision.pose import SmoothedPoseResult
 from coach.vision.analysis.quality import QualityReport
+from coach.vision.constants import Issues
+from coach.vision.constants import PoseLandmark
+from coach.vision.pose import SmoothedPoseResult
 
 
 class StepDetector:

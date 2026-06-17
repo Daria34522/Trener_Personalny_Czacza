@@ -1,17 +1,19 @@
+from __future__ import annotations
+
 import os.path
-from gtts import gTTS
+
 import pygame
-import pyaudio
-import time
 import speech_recognition as sr
+from gtts import gTTS
 from PySide6.QtCore import QMutex
 
 pygame.mixer.init()
 pygame.mixer.set_num_channels(2)
 
+
 # Klasa nasłuchująca co mówi użytkownik
 class Listener:
-    def __init__(self, language = "pl"):
+    def __init__(self, language="pl"):
         self.language = language
         self.recognizer = sr.Recognizer()
 
@@ -23,7 +25,7 @@ class Listener:
     # Zwracanie jako tekstu tego co mówi użytkownik
     def listen(self):
         try:
-            audio = self.recognizer.listen(self. source, timeout=5, phrase_time_limit=5)
+            audio = self.recognizer.listen(self.source, timeout=5, phrase_time_limit=5)
             text = self.recognizer.recognize_google(audio, language=self.language)
             return text
         except sr.WaitTimeoutError:
@@ -43,18 +45,19 @@ class Speaker:
         0: QMutex(),
     }
 
-    def __init__(self, lang ="pl", voice_filename= "voice.mp3", channel_id = 0):
+    def __init__(self, lang="pl", voice_filename="voice.mp3", channel_id=0):
         self.lang = lang
         self.voice_filename = voice_filename
         now_dir = os.path.dirname(os.path.abspath(__file__))
         if channel_id == 0:
             self.folder = os.path.join(now_dir, "voice_records")
-            self.voice_filename = os.path.join(self.folder, self.voice_filename + ".mp3")
+            self.voice_filename = os.path.join(
+                self.folder,
+                self.voice_filename + ".mp3",
+            )
         else:
             self.folder = os.path.join(now_dir, "../database/music")
             self.voice_filename = os.path.join(self.folder, self.voice_filename)
-
-
 
     # Tworzenie pliku audio
     def gen_speak(self, text):
@@ -82,5 +85,5 @@ class Speaker:
 
     # Kasowanie pliku audio
     def delete_file(self):
-        if(os.path.exists(self.voice_filename)):
+        if os.path.exists(self.voice_filename):
             os.remove(self.voice_filename)

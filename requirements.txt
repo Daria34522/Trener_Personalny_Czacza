@@ -9,3 +9,4 @@ gTTS
 pygame
 SpeechRecognition
 atomicx
+pre-commit

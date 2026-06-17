@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import os
 import sys
-from sys import path
 
 current_dir = os.path.dirname(__file__)
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
@@ -8,21 +9,17 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 from database.DBHandler import DBHandler
 
-from PIL import Image
-from PySide6.QtGui import QIcon, Qt
+from PySide6.QtGui import Qt
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QFileDialog,
-    QWidget,
     QLabel,
-    QPushButton,
     QFrame,
     QHBoxLayout,
     QMessageBox,
 )
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QSize, QDate
+from PySide6.QtCore import QFile, QDate
 
 db_path = os.path.join(parent_dir, "database/db.sqlite")
 db = DBHandler(db_path)
@@ -63,7 +60,7 @@ class CalendarMenu(QMainWindow):
             row_layout = QHBoxLayout(row_widget)
             lbl = QLabel("Wybierz konto, aby zobaczyć listę planów.")
             lbl.setStyleSheet(
-                "font-style: italic; color: #e74c3c; font-weight: bold; border: none;"
+                "font-style: italic; color: #e74c3c; font-weight: bold; border: none;",
             )
             row_layout.addWidget(lbl)
             layout.addWidget(row_widget)
@@ -87,11 +84,11 @@ class CalendarMenu(QMainWindow):
 
             label_opis = QLabel(str(opis))
             label_opis.setStyleSheet(
-                "font-size: 14px; color: #222222; font-weight: bold; border: none; background: transparent;"
+                "font-size: 14px; color: #222222; font-weight: bold; border: none; background: transparent;",
             )
             label_data = QLabel(str(data))
             label_data.setStyleSheet(
-                "font-size: 13px; color: #888888; border: none; background: transparent;"
+                "font-size: 13px; color: #888888; border: none; background: transparent;",
             )
             label_data.setAlignment(Qt.AlignCenter)
             Hours = czas // 3600
@@ -99,7 +96,7 @@ class CalendarMenu(QMainWindow):
             Time = f"{Hours:02d}:{Minutes:02d}"
             label_czas = QLabel(Time)
             label_czas.setStyleSheet(
-                "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;"
+                "font-size: 13px; color: #2b8a3e; font-weight: bold; border: none; background: transparent;",
             )
             label_czas.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
@@ -112,7 +109,9 @@ class CalendarMenu(QMainWindow):
     def addEntry(self):  # Dodanie planu na konkretny dzień
         if self.user_id == -1:
             QMessageBox.warning(
-                self, "Nie wybrane konto", "Wybierz konto aby dodać trening"
+                self,
+                "Nie wybrane konto",
+                "Wybierz konto aby dodać trening",
             )
         Time = self.ui.Time.time()
         Date = self.ui.Calendar2.selectedDate()
@@ -137,7 +136,6 @@ class CalendarMenu(QMainWindow):
 
         self.ui.Message.setText("Wpis został dodany")
         self.loadTrainingList()
-        pass
 
     def selectedDate(self):  # Wypisanie planu na wybrany dzień
         Date = self.ui.Calendar1.selectedDate()

@@ -1,6 +1,8 @@
-from voice_control import Speaker, Listener
+from __future__ import annotations
 
-if __name__ == '__main__':
+from voice_control import Speaker
+
+if __name__ == "__main__":
     speaker = Speaker(voice_filename="test")
     text = "Jestem twoim asystentem"
     speaker.gen_speak(text)

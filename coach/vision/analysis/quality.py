@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import numpy as np
-
 from dataclasses import dataclass
 from dataclasses import field
 
-from coach.vision.constants import PoseLandmark
-from coach.vision.constants import Issues
-from coach.vision.pose import SmoothedPoseResult
+import numpy as np
 
 from coach.vision.analysis import maths
+from coach.vision.constants import Issues
+from coach.vision.constants import PoseLandmark
+from coach.vision.pose import SmoothedPoseResult
 
 
 @dataclass
